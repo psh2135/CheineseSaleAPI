@@ -2,8 +2,11 @@
 {
     public class CreatePurchaseDto
     {
+        [Required]
         public int BuyerId { get; set; }
+        [Required]
         public int PackageId { get; set; }
+        [Required]
         public int Quantity { get; set; }
     }
     public class PurchaseDto
