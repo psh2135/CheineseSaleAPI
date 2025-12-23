@@ -19,56 +19,121 @@ namespace ChineseSaleApi.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Gift -> Donor (User)
+            base.OnModelCreating(modelBuilder);
+
+            // =========================
+            // User
+            // =========================
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.Property(u => u.Email)
+                      .HasMaxLength(100)
+                      .IsRequired();
+
+                entity.Property(u => u.UserName)
+                      .HasMaxLength(50); // ❌ לא ייחודי
+
+                entity.Property(u => u.PasswordHash)
+                      .HasMaxLength(256)
+                      .IsRequired();
+
+                entity.Property(u => u.Phone)
+                      .HasMaxLength(20);
+
+                entity.Property(u => u.Role)
+                      .HasMaxLength(20)
+                      .HasDefaultValue("Buyer");
+
+                entity.Property(u => u.FirstName)
+                      .HasMaxLength(50);
+
+                entity.Property(u => u.LastName)
+                      .HasMaxLength(50);
+
+                entity.Property(u => u.Address)
+                      .HasMaxLength(200);
+
+                // ✅ אימייל ייחודי
+                entity.HasIndex(u => u.Email)
+                      .IsUnique();
+            });
+
+            // =========================
+            // Gift -> Donor
+            // =========================
+            modelBuilder.Entity<Gift>()
+                .Property(g => g.Title)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            modelBuilder.Entity<Gift>()
+                .Property(g => g.Description)
+                .HasMaxLength(500)
+                .IsRequired();
+
             modelBuilder.Entity<Gift>()
                 .HasOne(g => g.Donor)
                 .WithMany(u => u.Gifts)
                 .HasForeignKey(g => g.DonorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Purchase -> Buyer (User)
+            // =========================
+            // Purchase
+            // =========================
             modelBuilder.Entity<Purchase>()
                 .HasOne(p => p.Buyer)
                 .WithMany(u => u.Purchases)
                 .HasForeignKey(p => p.BuyerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Purchase -> Package
             modelBuilder.Entity<Purchase>()
                 .HasOne(p => p.Package)
                 .WithMany(pkg => pkg.Purchases)
                 .HasForeignKey(p => p.PackageId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Ticket -> Purchase
+            // =========================
+            // Package
+            // =========================
+            modelBuilder.Entity<Package>()
+                .Property(p => p.Name)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            modelBuilder.Entity<Package>()
+                .Property(p => p.Price)
+                .HasPrecision(10, 2);
+
+            // =========================
+            // Ticket
+            // =========================
             modelBuilder.Entity<Ticket>()
                 .HasOne(t => t.Purchase)
                 .WithMany(p => p.Tickets)
                 .HasForeignKey(t => t.PurchaseId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Ticket -> Gift
             modelBuilder.Entity<Ticket>()
                 .HasOne(t => t.Gift)
                 .WithMany(g => g.Tickets)
                 .HasForeignKey(t => t.GiftId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Ticket -> Buyer
             modelBuilder.Entity<Ticket>()
                 .HasOne(t => t.Buyer)
                 .WithMany(u => u.Tickets)
                 .HasForeignKey(t => t.BuyerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // LotteryResult -> Gift (One to One)
+            // =========================
+            // LotteryResult
+            // =========================
             modelBuilder.Entity<LotteryResult>()
                 .HasOne(l => l.Gift)
                 .WithOne()
                 .HasForeignKey<LotteryResult>(l => l.GiftId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // LotteryResult -> Winner (User)
             modelBuilder.Entity<LotteryResult>()
                 .HasOne(l => l.Winner)
                 .WithMany()

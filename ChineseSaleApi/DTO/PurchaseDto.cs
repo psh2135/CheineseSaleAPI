@@ -1,4 +1,6 @@
-﻿namespace ChineseSaleApi.DTO
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ChineseSaleApi.DTO
 {
     public class CreatePurchaseDto
     {
