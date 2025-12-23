@@ -8,8 +8,6 @@
         public class TicketDto
         {
             public int Id { get; set; }
-
-            [Required]
             public int GiftId { get; set; }
         }
 
@@ -17,10 +15,7 @@
         // GET /buyers/{id}/tickets
         public class BuyerTicketsDto
         {
-            [Required]
             public int BuyerId { get; set; }
-
-            [Required]
             public List<TicketDto> Tickets { get; set; } = new();
         }
 
@@ -29,16 +24,9 @@
         public class TicketAdminDto
         {
             public int TicketId { get; set; }
-
-            [Required]
             public int GiftId { get; set; }
-
-            [Required]
             public int BuyerId { get; set; }
-
-            [Required]
             public int PurchaseId { get; set; }
-
             public DateTime CreatedAt { get; set; }
         }
 
