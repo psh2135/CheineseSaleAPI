@@ -1,14 +1,60 @@
 ﻿namespace ChineseSaleApi.DTO
 {
-    public class TicketDto
+    using System.ComponentModel.DataAnnotations;
+
+    namespace ChineseSaleApi.DTO
     {
-        public int Id { get; set; }
-        public int GiftId { get; set; }
+        // DTO בסיסי לתצוגה
+        public class TicketDto
+        {
+            public int Id { get; set; }
+
+            [Required]
+            public int GiftId { get; set; }
+        }
+
+        // DTO להצגת כרטיסי רוכש
+        // GET /buyers/{id}/tickets
+        public class BuyerTicketsDto
+        {
+            [Required]
+            public int BuyerId { get; set; }
+
+            [Required]
+            public List<TicketDto> Tickets { get; set; } = new();
+        }
+
+        // DTO לניהול / אדמין
+        // GET /admin/tickets
+        public class TicketAdminDto
+        {
+            public int TicketId { get; set; }
+
+            [Required]
+            public int GiftId { get; set; }
+
+            [Required]
+            public int BuyerId { get; set; }
+
+            [Required]
+            public int PurchaseId { get; set; }
+
+            public DateTime CreatedAt { get; set; }
+        }
+
+
+        public class CreateTicketDto
+        {
+            [Required]
+            public int PurchaseId { get; set; }
+
+            [Required]
+            public int BuyerId { get; set; }
+
+            [Required]
+            public int GiftId { get; set; }
+        }
     }
-    public class BuyerTicketsDto
-    {
-        public int BuyerId { get; set; }
-        public List<TicketDto> Tickets { get; set; } = new();
-    }
+
 
 }
