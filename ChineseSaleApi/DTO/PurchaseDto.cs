@@ -9,6 +9,7 @@ namespace ChineseSaleApi.DTO
         [Required]
         public int PackageId { get; set; }
         [Required]
+        [Range(1, 100)]
         public int Quantity { get; set; }
     }
     public class PurchaseDto

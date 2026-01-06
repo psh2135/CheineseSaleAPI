@@ -22,7 +22,7 @@ namespace ChineseSaleApi.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("ChineseSaleApi.models.Gift", b =>
+            modelBuilder.Entity("ChineseSaleApi.Models.Gift", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -41,56 +41,27 @@ namespace ChineseSaleApi.Migrations
                     b.Property<int>("DonorId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsDrawn")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int?>("WinnerUserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("DonorId");
 
+                    b.HasIndex("WinnerUserId");
+
                     b.ToTable("Gifts");
                 });
 
-            modelBuilder.Entity("ChineseSaleApi.models.LotteryResult", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DrawnAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DrawnByAdminId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("GiftId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WinnerUserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WinningTicketId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DrawnByAdminId");
-
-                    b.HasIndex("GiftId")
-                        .IsUnique();
-
-                    b.HasIndex("WinnerUserId");
-
-                    b.HasIndex("WinningTicketId");
-
-                    b.ToTable("LotteryResults");
-                });
-
-            modelBuilder.Entity("ChineseSaleApi.models.Package", b =>
+            modelBuilder.Entity("ChineseSaleApi.Models.Package", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -118,7 +89,7 @@ namespace ChineseSaleApi.Migrations
                     b.ToTable("Packages");
                 });
 
-            modelBuilder.Entity("ChineseSaleApi.models.Purchase", b =>
+            modelBuilder.Entity("ChineseSaleApi.Models.Purchase", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -129,13 +100,16 @@ namespace ChineseSaleApi.Migrations
                     b.Property<int>("BuyerId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("PackageId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("PurchasedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -147,16 +121,13 @@ namespace ChineseSaleApi.Migrations
                     b.ToTable("Purchases");
                 });
 
-            modelBuilder.Entity("ChineseSaleApi.models.Ticket", b =>
+            modelBuilder.Entity("ChineseSaleApi.Models.Ticket", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("BuyerId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -169,8 +140,6 @@ namespace ChineseSaleApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BuyerId");
-
                     b.HasIndex("GiftId");
 
                     b.HasIndex("PurchaseId");
@@ -178,17 +147,13 @@ namespace ChineseSaleApi.Migrations
                     b.ToTable("Tickets");
                 });
 
-            modelBuilder.Entity("ChineseSaleApi.models.User", b =>
+            modelBuilder.Entity("ChineseSaleApi.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Address")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -198,22 +163,10 @@ namespace ChineseSaleApi.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("FirstName")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("LastName")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("Phone")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -235,61 +188,33 @@ namespace ChineseSaleApi.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ChineseSaleApi.models.Gift", b =>
+            modelBuilder.Entity("ChineseSaleApi.Models.Gift", b =>
                 {
-                    b.HasOne("ChineseSaleApi.models.User", "Donor")
+                    b.HasOne("ChineseSaleApi.Models.User", "Donor")
                         .WithMany("Gifts")
                         .HasForeignKey("DonorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Donor");
-                });
-
-            modelBuilder.Entity("ChineseSaleApi.models.LotteryResult", b =>
-                {
-                    b.HasOne("ChineseSaleApi.models.User", "DrawnByAdmin")
-                        .WithMany()
-                        .HasForeignKey("DrawnByAdminId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ChineseSaleApi.models.Gift", "Gift")
-                        .WithOne()
-                        .HasForeignKey("ChineseSaleApi.models.LotteryResult", "GiftId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ChineseSaleApi.models.User", "Winner")
+                    b.HasOne("ChineseSaleApi.Models.User", "Winner")
                         .WithMany()
                         .HasForeignKey("WinnerUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("ChineseSaleApi.models.Ticket", "WinningTicket")
-                        .WithMany()
-                        .HasForeignKey("WinningTicketId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DrawnByAdmin");
-
-                    b.Navigation("Gift");
+                    b.Navigation("Donor");
 
                     b.Navigation("Winner");
-
-                    b.Navigation("WinningTicket");
                 });
 
-            modelBuilder.Entity("ChineseSaleApi.models.Purchase", b =>
+            modelBuilder.Entity("ChineseSaleApi.Models.Purchase", b =>
                 {
-                    b.HasOne("ChineseSaleApi.models.User", "Buyer")
+                    b.HasOne("ChineseSaleApi.Models.User", "Buyer")
                         .WithMany("Purchases")
                         .HasForeignKey("BuyerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("ChineseSaleApi.models.Package", "Package")
+                    b.HasOne("ChineseSaleApi.Models.Package", "Package")
                         .WithMany("Purchases")
                         .HasForeignKey("PackageId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -300,55 +225,45 @@ namespace ChineseSaleApi.Migrations
                     b.Navigation("Package");
                 });
 
-            modelBuilder.Entity("ChineseSaleApi.models.Ticket", b =>
+            modelBuilder.Entity("ChineseSaleApi.Models.Ticket", b =>
                 {
-                    b.HasOne("ChineseSaleApi.models.User", "Buyer")
-                        .WithMany("Tickets")
-                        .HasForeignKey("BuyerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ChineseSaleApi.models.Gift", "Gift")
+                    b.HasOne("ChineseSaleApi.Models.Gift", "Gift")
                         .WithMany("Tickets")
                         .HasForeignKey("GiftId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("ChineseSaleApi.models.Purchase", "Purchase")
+                    b.HasOne("ChineseSaleApi.Models.Purchase", "Purchase")
                         .WithMany("Tickets")
                         .HasForeignKey("PurchaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Buyer");
 
                     b.Navigation("Gift");
 
                     b.Navigation("Purchase");
                 });
 
-            modelBuilder.Entity("ChineseSaleApi.models.Gift", b =>
+            modelBuilder.Entity("ChineseSaleApi.Models.Gift", b =>
                 {
                     b.Navigation("Tickets");
                 });
 
-            modelBuilder.Entity("ChineseSaleApi.models.Package", b =>
+            modelBuilder.Entity("ChineseSaleApi.Models.Package", b =>
                 {
                     b.Navigation("Purchases");
                 });
 
-            modelBuilder.Entity("ChineseSaleApi.models.Purchase", b =>
+            modelBuilder.Entity("ChineseSaleApi.Models.Purchase", b =>
                 {
                     b.Navigation("Tickets");
                 });
 
-            modelBuilder.Entity("ChineseSaleApi.models.User", b =>
+            modelBuilder.Entity("ChineseSaleApi.Models.User", b =>
                 {
                     b.Navigation("Gifts");
 
                     b.Navigation("Purchases");
-
-                    b.Navigation("Tickets");
                 });
 #pragma warning restore 612, 618
         }

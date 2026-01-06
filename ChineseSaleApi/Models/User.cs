@@ -1,23 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Net.Sockets;
-
-namespace ChineseSaleApi.models
+﻿namespace ChineseSaleApi.Models
 {
     public class User
     {
         public int Id { get; set; }
+
         public string UserName { get; set; } = null!;
         public string Email { get; set; } = null!;
         public string PasswordHash { get; set; } = null!;
-        public string? Phone { get; set; }
+
         public string Role { get; set; } = "Buyer"; // Admin / Buyer / Donor
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public string? FirstName { get; set; }
-        public string? LastName { get; set; }
-        public string? Address { get; set; }
 
         public ICollection<Gift> Gifts { get; set; } = new List<Gift>();
         public ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
-        public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
     }
 }

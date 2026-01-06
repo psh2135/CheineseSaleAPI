@@ -29,19 +29,6 @@
             public int PurchaseId { get; set; }
             public DateTime CreatedAt { get; set; }
         }
-
-
-        public class CreateTicketDto
-        {
-            [Required]
-            public int PurchaseId { get; set; }
-
-            [Required]
-            public int BuyerId { get; set; }
-
-            [Required]
-            public int GiftId { get; set; }
-        }
     }
 
 

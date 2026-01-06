@@ -5,7 +5,7 @@ namespace ChineseSaleApi.DTO
     public class CreatePackageDto
     {
         [Required]
-        [MaxLength(20)]
+        [MaxLength(100)]
         public string Name { get; set; } = null!;
         [Required]
         [Range(20, 9000)]

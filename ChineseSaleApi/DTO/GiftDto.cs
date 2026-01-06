@@ -5,10 +5,10 @@ namespace ChineseSaleApi.DTO
     public class CreateGiftDto
     {
         [Required]
-        [StringLength(50, MinimumLength = 2)]
+        [StringLength(100, MinimumLength = 2)]
         public string Title { get; set; } = null!;
         [Required]
-        [StringLength(250, MinimumLength = 2)]
+        [StringLength(500, MinimumLength = 2)]
         public string Description { get; set; } = null!;
         [Required]
         public int DonorId { get; set; }
