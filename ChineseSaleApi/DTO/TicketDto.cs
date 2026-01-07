@@ -10,6 +10,14 @@
             public int Id { get; set; }
             public int GiftId { get; set; }
         }
+        public class CreateTicketDto
+        {
+            [Required]
+            public int GiftId { get; set; }
+
+            [Required]
+            public int PurchaseId { get; set; }
+        }
 
         // DTO להצגת כרטיסי רוכש
         // GET /buyers/{id}/tickets

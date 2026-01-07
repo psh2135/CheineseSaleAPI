@@ -1,4 +1,8 @@
+using AutoMapper;
 using ChineseSaleApi.Data;
+using ChineseSaleApi.Mapping;
+using ChineseSaleApi.Repositories;
+using ChineseSaleApi.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +16,24 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
+//builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddScoped<ILotteryRepository, LotteryRepository>();
+builder.Services.AddScoped<ILotteryService, LotteryService>();
+
+// Gift
+builder.Services.AddScoped<IGiftRepository, GiftRepository>();
+builder.Services.AddScoped<IGiftService, GiftService>();
+
+// Purchase
+builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
+builder.Services.AddScoped<IPurchaseService, PurchaseService>();
+
+// Ticket
+builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+builder.Services.AddScoped<ITicketService, TicketService>();
 
 var app = builder.Build();
 
