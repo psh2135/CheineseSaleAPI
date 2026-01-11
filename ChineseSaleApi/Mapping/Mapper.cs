@@ -32,12 +32,13 @@ namespace ChineseSaleApi.Mapping
             CreateMap<Package, GiftDto>();
             CreateMap<CreatePackageDto, Package>();
             CreateMap<Package, CreatePackageDto>();
+
             //purches
             CreateMap<CreatePurchaseDto, Purchase>();
             CreateMap<Purchase, PurchaseDto>();
+
             //ticket
             CreateMap<CreateTicketDto, Ticket>();
-
             CreateMap<Ticket, TicketDto>();
 
             CreateMap<Ticket, TicketAdminDto>()

@@ -13,14 +13,13 @@ namespace ChineseSaleApi.Data
         public DbSet<Package> Packages { get; set; }
         public DbSet<Purchase> Purchases { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
+        public DbSet<Category> Categories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // =========================
             // User
-            // =========================
             modelBuilder.Entity<User>(entity =>
             {
                 entity.Property(u => u.UserName)
@@ -44,9 +43,7 @@ namespace ChineseSaleApi.Data
                       .IsUnique();
             });
 
-            // =========================
             // Gift
-            // =========================
             modelBuilder.Entity<Gift>(entity =>
             {
                 entity.Property(g => g.Title)
@@ -62,15 +59,18 @@ namespace ChineseSaleApi.Data
                       .HasForeignKey(g => g.DonorId)
                       .OnDelete(DeleteBehavior.Restrict);
 
+                entity.HasOne(g => g.Category)
+                     .WithMany(u => u.Gifts)
+                     .HasForeignKey(g => g.CategotyId)
+                     .OnDelete(DeleteBehavior.Restrict);
+
                 entity.HasOne(g => g.Winner)
                       .WithMany()
                       .HasForeignKey(g => g.WinnerUserId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
 
-            // =========================
             // Package
-            // =========================
             modelBuilder.Entity<Package>(entity =>
             {
                 entity.Property(p => p.Name)
@@ -84,9 +84,7 @@ namespace ChineseSaleApi.Data
                       .IsRequired();
             });
 
-            // =========================
             // Purchase
-            // =========================
             modelBuilder.Entity<Purchase>(entity =>
             {
                 entity.HasOne(p => p.Buyer)
@@ -100,9 +98,7 @@ namespace ChineseSaleApi.Data
                       .OnDelete(DeleteBehavior.Restrict);
             });
 
-            // =========================
             // Ticket
-            // =========================
             modelBuilder.Entity<Ticket>(entity =>
             {
                 entity.HasOne(t => t.Purchase)
@@ -114,6 +110,13 @@ namespace ChineseSaleApi.Data
                       .WithMany(g => g.Tickets)
                       .HasForeignKey(t => t.GiftId)
                       .OnDelete(DeleteBehavior.Restrict);
+            });
+            // Category
+            modelBuilder.Entity<Category>(entity =>
+            {
+                entity.Property(c => c.Name)
+                      .HasMaxLength(50)
+                      .IsRequired();
             });
         }
     }
