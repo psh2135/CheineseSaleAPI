@@ -6,11 +6,24 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ChineseSaleApi.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCreateV2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Categories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Categories", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Packages",
                 columns: table => new
@@ -53,6 +66,7 @@ namespace ChineseSaleApi.Migrations
                     Title = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     DonorId = table.Column<int>(type: "int", nullable: false),
+                    CategotyId = table.Column<int>(type: "int", nullable: false),
                     IsDrawn = table.Column<bool>(type: "bit", nullable: false),
                     WinnerUserId = table.Column<int>(type: "int", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -60,6 +74,12 @@ namespace ChineseSaleApi.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Gifts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Gifts_Categories_CategotyId",
+                        column: x => x.CategotyId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Gifts_Users_DonorId",
                         column: x => x.DonorId,
@@ -111,8 +131,7 @@ namespace ChineseSaleApi.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     GiftId = table.Column<int>(type: "int", nullable: false),
                     PurchaseId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -129,12 +148,12 @@ namespace ChineseSaleApi.Migrations
                         principalTable: "Purchases",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Tickets_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Gifts_CategotyId",
+                table: "Gifts",
+                column: "CategotyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Gifts_DonorId",
@@ -167,11 +186,6 @@ namespace ChineseSaleApi.Migrations
                 column: "PurchaseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tickets_UserId",
-                table: "Tickets",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
                 table: "Users",
                 column: "Email",
@@ -189,6 +203,9 @@ namespace ChineseSaleApi.Migrations
 
             migrationBuilder.DropTable(
                 name: "Purchases");
+
+            migrationBuilder.DropTable(
+                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Packages");
