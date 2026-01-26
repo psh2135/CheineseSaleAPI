@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using ChineseSaleApi.Data;
 using ChineseSaleApi.DTO;
-using ChineseSaleApi.models;
+using ChineseSaleApi.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic; 
 using System.Linq;

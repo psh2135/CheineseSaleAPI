@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using ChineseSaleApi.DTO;
 using ChineseSaleApi.DTO.ChineseSaleApi.DTO;
+
+//using ChineseSaleApi.DTO.ChineseSaleApi.DTO;
 using ChineseSaleApi.Models;
 
 namespace ChineseSaleApi.Mapping
@@ -29,7 +31,7 @@ namespace ChineseSaleApi.Mapping
             
             //package
             CreateMap<PackageDto, Package>();
-            CreateMap<Package, GiftDto>();
+            CreateMap<Package, PackageDto>();
             CreateMap<CreatePackageDto, Package>();
             CreateMap<Package, CreatePackageDto>();
 
@@ -43,7 +45,11 @@ namespace ChineseSaleApi.Mapping
 
             CreateMap<Ticket, TicketAdminDto>()
                 .ForMember(d => d.TicketId, o => o.MapFrom(s => s.Id))
-                .ForMember(d => d.BuyerId, o => o.MapFrom(s => s.Purchase.BuyerId));
+                .ForMember(d => d.BuyerId, o => o.MapFrom(s => s.Purchase != null ? s.Purchase.BuyerId : 0))
+                .ForMember(d => d.GiftId, o => o.MapFrom(s => s.GiftId))
+                .ForMember(d => d.PurchaseId, o => o.MapFrom(s => s.PurchaseId))
+                .ForMember(d => d.CreatedAt, o => o.MapFrom(s => s.CreatedAt));
+
 
 
         }

@@ -1,6 +1,7 @@
 ﻿using ChineseSaleApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using ChineseSaleApi.DTO.ChineseSaleApi.DTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ChineseSaleApi.Controllers
 {
@@ -20,7 +21,6 @@ namespace ChineseSaleApi.Controllers
         {
             return Ok(_service.Create(dto));
         }
-
         [HttpGet("gift/{giftId}")]
         public IActionResult GetByGift(int giftId)
         {

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChineseSaleApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260106150421_RemoveTicketUserRelation")]
-    partial class RemoveTicketUserRelation
+    [Migration("20260112122853_InitialCreateV2")]
+    partial class InitialCreateV2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,6 +25,24 @@ namespace ChineseSaleApi.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ChineseSaleApi.Models.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories");
+                });
+
             modelBuilder.Entity("ChineseSaleApi.Models.Gift", b =>
                 {
                     b.Property<int>("Id")
@@ -32,6 +50,9 @@ namespace ChineseSaleApi.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategotyId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -56,6 +77,8 @@ namespace ChineseSaleApi.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategotyId");
 
                     b.HasIndex("DonorId");
 
@@ -193,6 +216,12 @@ namespace ChineseSaleApi.Migrations
 
             modelBuilder.Entity("ChineseSaleApi.Models.Gift", b =>
                 {
+                    b.HasOne("ChineseSaleApi.Models.Category", "Category")
+                        .WithMany("Gifts")
+                        .HasForeignKey("CategotyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("ChineseSaleApi.Models.User", "Donor")
                         .WithMany("Gifts")
                         .HasForeignKey("DonorId")
@@ -203,6 +232,8 @@ namespace ChineseSaleApi.Migrations
                         .WithMany()
                         .HasForeignKey("WinnerUserId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Category");
 
                     b.Navigation("Donor");
 
@@ -245,6 +276,11 @@ namespace ChineseSaleApi.Migrations
                     b.Navigation("Gift");
 
                     b.Navigation("Purchase");
+                });
+
+            modelBuilder.Entity("ChineseSaleApi.Models.Category", b =>
+                {
+                    b.Navigation("Gifts");
                 });
 
             modelBuilder.Entity("ChineseSaleApi.Models.Gift", b =>

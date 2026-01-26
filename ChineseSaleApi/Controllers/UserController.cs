@@ -1,10 +1,12 @@
 ﻿using ChineseSaleApi.DTO;
 using ChineseSaleApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChineseSaleApi.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("[controller]")]
     public class UserController : ControllerBase
     {
@@ -13,6 +15,7 @@ namespace ChineseSaleApi.Controllers
             _userService = userService;
         }
         [HttpPost(Name = "CreateUser")]
+        [Authorize(Roles = "Manager")]
         public IActionResult CreateUser(CreateUserDto user)
         {
             CreateUserDto result = _userService.CreateUser(user);
