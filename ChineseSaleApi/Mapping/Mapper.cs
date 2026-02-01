@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using ChineseSaleApi.DTO;
 using ChineseSaleApi.DTO.ChineseSaleApi.DTO;
+using ChineseSaleApi.DTO.ChineseSaleApi.DTOs;
+
 
 //using ChineseSaleApi.DTO.ChineseSaleApi.DTO;
 using ChineseSaleApi.Models;
@@ -14,7 +16,8 @@ namespace ChineseSaleApi.Mapping
             //user
             CreateMap<UserDto, User>();
             CreateMap<User, UserDto>();
-            CreateMap<CreateUserDto, User>();
+            CreateMap<CreateUserDto, User>()
+     .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
             CreateMap<User, CreateUserDto>();
             
             //gift
@@ -22,13 +25,18 @@ namespace ChineseSaleApi.Mapping
             CreateMap<Gift, GiftDto>();
             CreateMap<CreateGiftDto, Gift>();
             CreateMap<Gift, CreateGiftDto>();
-            
+
+            //category
+            CreateMap<CategoryDto, Category>();
+            CreateMap<Category, CategoryDto>();
+            CreateMap<CreateCategoryDto, Category>();
+            CreateMap<Category, CreateCategoryDto>();
             //lottery
             //CreateMap<RunLotteryDto, LotteryResult>();
             //CreateMap<LotteryResult, RunLotteryDto>();
             //CreateMap<LotteryResultDto, LotteryResult>();
             //CreateMap<LotteryResult, LotteryResultDto>();
-            
+
             //package
             CreateMap<PackageDto, Package>();
             CreateMap<Package, PackageDto>();

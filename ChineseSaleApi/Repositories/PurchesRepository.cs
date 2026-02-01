@@ -32,14 +32,14 @@ namespace ChineseSaleApi.Repositories
         public Purchase? GetById(int id)
         {
             return _context.Purchases
-                .Include(p => p.Package)
+                .Include(p => p.Packages)
                 .FirstOrDefault(p => p.Id == id);
         }
 
         public IEnumerable<Purchase> GetAll()
         {
             return _context.Purchases
-                .Include(p => p.Package)
+                .Include(p => p.Packages)
                 .ToList();
         }
 

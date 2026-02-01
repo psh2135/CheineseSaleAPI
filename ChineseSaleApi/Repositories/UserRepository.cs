@@ -10,66 +10,41 @@ namespace ChineseSaleApi.Repositories
 {
     public interface IUserRepository
     {
-        CreateUserDto CreateUser(CreateUserDto user);
-        UserDto GetUserById(int id);         
-        UserDto UpdateUser(UserDto user);
-        UserDto DeleteUser(int id);         
-        IEnumerable<UserDto> GetAllUsers();
+        User GetById(int id);
+        User GetByEmail(string email);
+        IEnumerable<User> GetUsersByRole(string role); // פונקציה גנרית לקבלת משתמשים לפי תפקיד
+        void Add(User user);
+        bool Save();
     }
-
     public class UserRepository : IUserRepository
     {
-        private readonly AppDbContext _dbContext;
-        private readonly IMapper _mapper;
+        private readonly AppDbContext _context;
 
-        public UserRepository(AppDbContext dbContext, IMapper mapper)
+        public UserRepository(AppDbContext context)
         {
-            _dbContext = dbContext;
-            _mapper = mapper;
+            _context = context;
         }
 
-        public CreateUserDto CreateUser(CreateUserDto user)
-        {
-            var userModel = _mapper.Map<User>(user);
-            _dbContext.Users.Add(userModel);
-            _dbContext.SaveChanges();
+        public User GetById(int id) => _context.Users.Find(id);
 
-            return _mapper.Map<CreateUserDto>(userModel);
+        public User GetByEmail(string email)
+        {
+            return _context.Users.FirstOrDefault(u => u.Email == email);
         }
 
-        public UserDto GetUserById(int id)
+        public IEnumerable<User> GetUsersByRole(string role)
         {
-            var userModel = _dbContext.Users.FirstOrDefault(u => u.Id == id);
-            return userModel == null ? null : _mapper.Map<UserDto>(userModel);
-
+            return _context.Users.Where(u => u.Role == role).ToList();
         }
 
-        public UserDto UpdateUser(UserDto user)
+        public void Add(User user)
         {
-            var existingUser = _dbContext.Users.FirstOrDefault(u => u.Id == user.Id);
-            if (existingUser == null) return null; 
-
-            _mapper.Map(user, existingUser);
-            _dbContext.SaveChanges();
-
-            return _mapper.Map<UserDto>(existingUser);
+            _context.Users.Add(user);
         }
 
-        public UserDto DeleteUser(int id)
+        public bool Save()
         {
-            var existingUser = _dbContext.Users.FirstOrDefault(u => u.Id == id);
-            if (existingUser == null) return null; 
-
-            _dbContext.Users.Remove(existingUser);
-            _dbContext.SaveChanges();
-
-            return _mapper.Map<UserDto>(existingUser);
-        }
-
-        public IEnumerable<UserDto> GetAllUsers()
-        {
-            var users = _dbContext.Users.ToList(); 
-            return _mapper.Map<IEnumerable<UserDto>>(users);
+            return _context.SaveChanges() >= 0;
         }
     }
 }

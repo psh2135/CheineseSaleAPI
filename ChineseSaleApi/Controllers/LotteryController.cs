@@ -1,5 +1,6 @@
 ﻿using ChineseSaleApi.DTO;
 using ChineseSaleApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChineseSaleApi.Controllers
@@ -16,6 +17,7 @@ namespace ChineseSaleApi.Controllers
         }
 
         [HttpPost("run")]
+        [Authorize(Roles = "Admin")]
         public IActionResult RunLottery([FromBody] RunLotteryDto dto)
         {
             var result = _service.RunLottery(dto);

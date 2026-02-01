@@ -13,8 +13,6 @@ namespace ChineseSaleApi.DTO
         [Required]
         [StringLength(50, MinimumLength = 8)]
         public string Password { get; set; } = null!;
-        [StringLength(20)]
-        public string Role { get; set; } = "Buyer";
     }
     public class UserDto
     {
@@ -22,6 +20,7 @@ namespace ChineseSaleApi.DTO
         public string UserName { get; set; } = null!;
         public string Email { get; set; } = null!;
         public string Role { get; set; } = null!;
+        public string Token { get; set; } = null!; // השדה החדש
     }
 
 }

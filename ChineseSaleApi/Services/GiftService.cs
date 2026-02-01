@@ -6,9 +6,9 @@ using AutoMapper;
 public interface IGiftService
 {
     GiftDto CreateGift(CreateGiftDto dto);
-    GiftDto GetGiftById(int id);
+    GiftDto? GetGiftById(int id);
     IEnumerable<GiftDto> GetAllGifts();
-    GiftDto UpdateGift(GiftDto dto);
+    GiftDto? UpdateGift(GiftDto dto);
     void DeleteGift(int id);
 }
 public class GiftService : IGiftService
@@ -17,10 +17,7 @@ public class GiftService : IGiftService
     private readonly IMapper _mapper;
     private readonly AppDbContext _context;
 
-    public GiftService(
-        IGiftRepository repository,
-        IMapper mapper,
-        AppDbContext context)
+    public GiftService(IGiftRepository repository, IMapper mapper, AppDbContext context)
     {
         _repository = repository;
         _mapper = mapper;
@@ -37,7 +34,7 @@ public class GiftService : IGiftService
         return _mapper.Map<GiftDto>(gift);
     }
 
-    public GiftDto GetGiftById(int id)
+    public GiftDto? GetGiftById(int id)
     {
         var gift = _repository.GetById(id);
         if (gift == null) return null;
@@ -51,7 +48,7 @@ public class GiftService : IGiftService
         return _mapper.Map<IEnumerable<GiftDto>>(gifts);
     }
 
-    public GiftDto UpdateGift(GiftDto dto)
+    public GiftDto? UpdateGift(GiftDto dto)
     {
         var gift = _repository.GetById(dto.Id);
         if (gift == null) return null;

@@ -18,7 +18,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+builder.Services.AddSwaggerGen(
+c =>
 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
 {
     Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
@@ -52,7 +53,8 @@ builder.Services.AddScoped<IPurchaseService, PurchaseService>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<ITicketService, TicketService>();
 
-
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -62,16 +64,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = "MyApp",
-            ValidAudience = "MyApp",
+            ValidIssuer = "ChineseSaleApi",
+            ValidAudience = "ChineseSaleApiUsers",
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes("SUPER_SECRET_KEY_123456_SUPER_SECRET_KEY_123456")),
             RoleClaimType = ClaimTypes.Role
         };
     });
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
-builder.Services.AddAuthorization();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

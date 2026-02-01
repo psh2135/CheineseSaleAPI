@@ -59,10 +59,10 @@ namespace ChineseSaleApi.Data
                       .HasForeignKey(g => g.DonorId)
                       .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(g => g.Category)
-                     .WithMany(u => u.Gifts)
-                     .HasForeignKey(g => g.CategotyId)
-                     .OnDelete(DeleteBehavior.Restrict);
+                //entity.HasOne(g => g.Category)
+                //     .WithMany(u => u.Gifts)
+                //     .HasForeignKey(g => g.CategotyId)
+                //     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(g => g.Winner)
                       .WithMany()
@@ -92,10 +92,10 @@ namespace ChineseSaleApi.Data
                       .HasForeignKey(p => p.BuyerId)
                       .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(p => p.Package)
-                      .WithMany(pkg => pkg.Purchases)
-                      .HasForeignKey(p => p.PackageId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                //entity.HasOne(p => p.Package)
+                //      .WithMany(pkg => pkg.Purchases)
+                //      .HasForeignKey(p => p.PackageId)
+                //      .OnDelete(DeleteBehavior.Restrict);
             });
 
             // Ticket
@@ -119,82 +119,84 @@ namespace ChineseSaleApi.Data
                       .IsRequired();
             });
         }
-        using Microsoft.EntityFrameworkCore;
-
-namespace ChineseSaleApi.Data
-{
-    public class AppDbContext : DbContext
-    {
-        public DbSet<User> Users { get; set; }
-        public DbSet<Package> Packages { get; set; }
-        public DbSet<Gift> Gifts { get; set; }
-
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<User>(entity =>
-            {
-                entity.Property(u => u.UserName)
-                      .HasMaxLength(200)
-                      .IsRequired();
-
-                entity.Property(u => u.Role)
-                      .HasMaxLength(200)
-                      .IsRequired()
-                      .HasDefaultValue("Buyer");
-
-                // הוספת ולידציה לטלפון
-                entity.Property(u => u.Phone)
-                      .HasMaxLength(200)
-                      .HasAnnotation("RegularExpression", @"^\+?[0-9\s\-]{7,15}$"); // רק ספרות, + ורווחים
-
-                entity.Property(u => u.PasswordHash)
-                      .HasMaxLength(200)
-                      .IsRequired();
-
-                entity.Property(u => u.LastName)
-                      .HasMaxLength(200);
-
-                entity.Property(u => u.FirstName)
-                      .HasMaxLength(200);
-
-                // הוספת ולידציה לאימייל
-                entity.Property(u => u.Email)
-                      .HasMaxLength(200)
-                      .IsRequired()
-                      .HasAnnotation("RegularExpression", @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-
-                entity.Property(u => u.Address)
-                      .HasMaxLength(200);
-
-                entity.HasIndex(u => u.Email)
-                      .IsUnique();
-            });
-
-            modelBuilder.Entity<Package>(entity =>
-            {
-                entity.Property(p => p.Name)
-                      .HasMaxLength(200)
-                      .IsRequired();
-
-                entity.Property(p => p.Price)
-                      .HasPrecision(10, 2);
-            });
-
-            modelBuilder.Entity<Gift>(entity =>
-            {
-                entity.Property(g => g.Title)
-                      .HasMaxLength(200)
-                      .IsRequired();
-
-                entity.Property(g => g.Description)
-                      .HasMaxLength(200)
-                      .IsRequired();
-            });
-        }
     }
 }
+//        using Microsoft.EntityFrameworkCore;
 
-    }
-}
+//namespace ChineseSaleApi.Data
+//{
+//    public class AppDbContext : DbContext
+//    {
+//        public DbSet<User> Users { get; set; }
+//        public DbSet<Package> Packages { get; set; }
+//        public DbSet<Gift> Gifts { get; set; }
+
+//        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
+//        protected override void OnModelCreating(ModelBuilder modelBuilder)
+//        {
+//            modelBuilder.Entity<User>(entity =>
+//            {
+//                entity.Property(u => u.UserName)
+//                      .HasMaxLength(200)
+//                      .IsRequired();
+
+//                entity.Property(u => u.Role)
+//                      .HasMaxLength(200)
+//                      .IsRequired()
+//                      .HasDefaultValue("Buyer");
+
+//                // הוספת ולידציה לטלפון
+//                entity.Property(u => u.Phone)
+//                      .HasMaxLength(200)
+//                      .HasAnnotation("RegularExpression", @"^\+?[0-9\s\-]{7,15}$"); // רק ספרות, + ורווחים
+
+//                entity.Property(u => u.PasswordHash)
+//                      .HasMaxLength(200)
+//                      .IsRequired();
+
+//                entity.Property(u => u.LastName)
+//                      .HasMaxLength(200);
+
+//                entity.Property(u => u.FirstName)
+//                      .HasMaxLength(200);
+
+//                // הוספת ולידציה לאימייל
+//                entity.Property(u => u.Email)
+//                      .HasMaxLength(200)
+//                      .IsRequired()
+//                      .HasAnnotation("RegularExpression", @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+
+//                entity.Property(u => u.Address)
+//                      .HasMaxLength(200);
+
+//                entity.HasIndex(u => u.Email)
+//                      .IsUnique();
+//            });
+
+//            modelBuilder.Entity<Package>(entity =>
+//            {
+//                entity.Property(p => p.Name)
+//                      .HasMaxLength(200)
+//                      .IsRequired();
+
+//                entity.Property(p => p.Price)
+//                      .HasPrecision(10, 2);
+//            });
+
+//            modelBuilder.Entity<Gift>(entity =>
+//            {
+//                entity.Property(g => g.Title)
+//                      .HasMaxLength(200)
+//                      .IsRequired();
+
+//                entity.Property(g => g.Description)
+//                      .HasMaxLength(200)
+//                      .IsRequired();
+//            });
+//        }
+//    }
+//}
+
+//    }
+//}

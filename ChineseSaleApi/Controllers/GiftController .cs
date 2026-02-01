@@ -57,11 +57,13 @@
 //}
 using ChineseSaleApi.DTO;
 using ChineseSaleApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
 namespace ChineseSaleApi.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class GiftsController : ControllerBase
@@ -86,6 +88,7 @@ namespace ChineseSaleApi.Controllers
 
         // GET: api/gifts
         [HttpGet]
+        [AllowAnonymous]
         public ActionResult<IEnumerable<GiftDto>> GetAllGifts()
         {
             var gifts = _giftService.GetAllGifts();
@@ -94,6 +97,7 @@ namespace ChineseSaleApi.Controllers
 
         // GET: api/gifts/{id}
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public ActionResult<GiftDto> GetGiftById(int id)
         {
             var gift = _giftService.GetGiftById(id);

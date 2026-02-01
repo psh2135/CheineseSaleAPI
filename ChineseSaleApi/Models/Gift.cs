@@ -5,14 +5,11 @@ namespace ChineseSaleApi.Models
     public class Gift
     {
         public int Id { get; set; }
-
         public string Title { get; set; } = null!;
         public string Description { get; set; } = null!;
-
         public int DonorId { get; set; }
         public User Donor { get; set; } = null!;
-        public int CategotyId { get; set; }
-        public Category Category { get; set; } = null!;
+        public ICollection<Category> Categories { get; set; } = null!;
         // הגרלה
         public bool IsDrawn { get; set; } = false;
         public int? WinnerUserId { get; set; }

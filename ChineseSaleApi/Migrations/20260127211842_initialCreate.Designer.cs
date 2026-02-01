@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChineseSaleApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260112122853_InitialCreateV2")]
-    partial class InitialCreateV2
+    [Migration("20260127211842_initialCreate")]
+    partial class initialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -10,7 +10,6 @@ public interface IGiftRepository
     IEnumerable<Gift> GetAll();
     void Update(Gift gift);
     void Delete(Gift gift);
-    bool Exists(int id);
 }
 public class GiftRepository : IGiftRepository
 {
@@ -25,12 +24,13 @@ public class GiftRepository : IGiftRepository
     {
         _context.Gifts.Add(gift);
         return gift;
+
     }
 
     public Gift? GetById(int id)
     {
         return _context.Gifts
-            .Include(g => g.Tickets)
+            .Include(g => g.Categories)
             .FirstOrDefault(g => g.Id == id);
     }
 
@@ -47,10 +47,5 @@ public class GiftRepository : IGiftRepository
     public void Delete(Gift gift)
     {
         _context.Gifts.Remove(gift);
-    }
-
-    public bool Exists(int id)
-    {
-        return _context.Gifts.Any(g => g.Id == id);
     }
 }

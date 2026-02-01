@@ -9,8 +9,7 @@ namespace ChineseSaleApi.Models
         public int BuyerId { get; set; }
         public User Buyer { get; set; } = null!;
 
-        public int PackageId { get; set; }
-        public Package Package { get; set; } = null!;
+        public ICollection<Package> Packages { get; set; } = null!;
 
         public int Quantity { get; set; }
 
