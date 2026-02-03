@@ -1,4 +1,5 @@
-﻿using ChineseSaleApi.DTO;
+﻿using AutoMapper;
+using ChineseSaleApi.DTO;
 using ChineseSaleApi.Repositories;
 
 namespace ChineseSaleApi.Services
@@ -6,15 +7,18 @@ namespace ChineseSaleApi.Services
     public interface ILotteryService
     {
         LotteryResultDto RunLottery(RunLotteryDto dto);
+        IEnumerable<LotteryResultDto> GetAllLotteryResults();
     }
 
     public class LotteryService : ILotteryService
     {
         private readonly ILotteryRepository _repository;
+        private readonly IMapper _mapper;
 
-        public LotteryService(ILotteryRepository repository)
+        public LotteryService(ILotteryRepository repository, IMapper mapper)
         {
             _repository = repository;
+            _mapper = mapper;
         }
 
         public LotteryResultDto RunLottery(RunLotteryDto dto)
@@ -46,6 +50,13 @@ namespace ChineseSaleApi.Services
                 WinningTicketId = winner.Id,
                 WinnerUserId = winner.Purchase.BuyerId
             };
+        }
+        public IEnumerable<LotteryResultDto> GetAllLotteryResults()
+        {
+            var drawnGifts = _repository.GetAllDrawnGifts();
+
+            // המרה ל-DTO (אפשר ידנית או עם AutoMapper)
+            return _mapper.Map<IEnumerable<LotteryResultDto>>(drawnGifts);
         }
     }
 }

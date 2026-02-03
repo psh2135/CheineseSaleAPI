@@ -8,6 +8,7 @@ public interface IGiftService
     GiftDto CreateGift(CreateGiftDto dto);
     GiftDto? GetGiftById(int id);
     IEnumerable<GiftDto> GetAllGifts();
+    IEnumerable<GiftDto> GetGiftsByCategory(int categoryId);
     GiftDto? UpdateGift(GiftDto dto);
     void DeleteGift(int id);
 }
@@ -47,7 +48,11 @@ public class GiftService : IGiftService
         var gifts = _repository.GetAll();
         return _mapper.Map<IEnumerable<GiftDto>>(gifts);
     }
-
+    public IEnumerable<GiftDto> GetGiftsByCategory(int categoryId)
+    {
+        var gifts = _repository.GetByCategory(categoryId);
+        return _mapper.Map<IEnumerable<GiftDto>>(gifts);
+    }
     public GiftDto? UpdateGift(GiftDto dto)
     {
         var gift = _repository.GetById(dto.Id);

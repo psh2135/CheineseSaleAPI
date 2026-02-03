@@ -8,6 +8,7 @@ public interface IGiftRepository
     Gift Add(Gift gift);
     Gift? GetById(int id);
     IEnumerable<Gift> GetAll();
+    IEnumerable<Gift> GetByCategory(int categoryId);
     void Update(Gift gift);
     void Delete(Gift gift);
 }
@@ -36,9 +37,19 @@ public class GiftRepository : IGiftRepository
 
     public IEnumerable<Gift> GetAll()
     {
-        return _context.Gifts.AsNoTracking().ToList();
+        return _context.Gifts
+            .Include(g => g.Categories)
+            .AsNoTracking()
+            .ToList();
     }
-
+    public IEnumerable<Gift> GetByCategory(int categoryId)
+    {
+        return _context.Gifts
+            .Include(g => g.Categories)
+            .Where(g => g.Categories.Any(c => c.Id == categoryId))
+            .AsNoTracking()
+            .ToList();
+    }
     public void Update(Gift gift)
     {
         _context.Gifts.Update(gift);

@@ -4,11 +4,11 @@
 
     namespace ChineseSaleApi.DTO
     {
-        // DTO בסיסי לתצוגה
         public class TicketDto
         {
             public int Id { get; set; }
             public int GiftId { get; set; }
+            public string GiftName { get; set; } = string.Empty;
         }
         public class CreateTicketDto
         {

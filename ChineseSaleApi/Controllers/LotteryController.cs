@@ -23,5 +23,11 @@ namespace ChineseSaleApi.Controllers
             var result = _service.RunLottery(dto);
             return Ok(result);
         }
+        [HttpGet("results")]
+        public IActionResult GetAllWinners()
+        {
+            var results = _service.GetAllLotteryResults();
+            return Ok(results);
+        }
     }
 }

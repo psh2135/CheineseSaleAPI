@@ -106,6 +106,12 @@ namespace ChineseSaleApi.Controllers
 
             return Ok(gift);
         }
+        [HttpGet("category/{categoryId}")]
+        public IActionResult GetByCategory(int categoryId)
+        {
+            var results = _giftService.GetGiftsByCategory(categoryId);
+            return Ok(results);
+        }
 
         // PUT: api/gifts/{id}
         [HttpPut("{id}")]

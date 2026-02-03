@@ -7,46 +7,63 @@ namespace ChineseSaleApi.Services
 {
     public interface IPurchaseService
     {
-        PurchaseDto Create(CreatePurchaseDto dto);
+        void AddToCart(AddToCartDto dto);
+        PurchaseDto CompletePurchase(int buyerId);
         PurchaseDto? GetById(int id);
-        IEnumerable<PurchaseDto> GetAll();
-        PurchaseDto? Delete(int id);
+        void RemoveFromCart(AddToCartDto dto);
     }
 
     public class PurchaseService : IPurchaseService
     {
-        private readonly IPurchaseRepository _repository;
+        private readonly IPurchaseRepository _repo;
         private readonly IMapper _mapper;
 
-        public PurchaseService(IPurchaseRepository repository, IMapper mapper)
+        public PurchaseService(IPurchaseRepository repo, IMapper mapper)
         {
-            _repository = repository;
+            _repo = repo;
             _mapper = mapper;
         }
 
-        public PurchaseDto Create(CreatePurchaseDto dto)
+        public void AddToCart(AddToCartDto dto)
         {
-            var entity = _mapper.Map<Purchase>(dto);
-            var saved = _repository.Create(entity);
-            return _mapper.Map<PurchaseDto>(saved);
+            var draft = _repo.GetOrCreateDraft(dto.BuyerId);
+            draft.GiftsAtCart.Add(dto.GiftId);
+            _repo.Update(draft);
         }
 
-        public PurchaseDto? GetById(int id)
+        public PurchaseDto CompletePurchase(int buyerId)
         {
-            var entity = _repository.GetById(id);
-            return entity == null ? null : _mapper.Map<PurchaseDto>(entity);
+            var draft = _repo.GetOrCreateDraft(buyerId);
+
+            // המרת ה-IDs מהסל לכרטיסים ממשיים
+            foreach (var giftId in draft.GiftsAtCart)
+            {
+                draft.Tickets.Add(new Ticket { GiftId = giftId });
+            }
+
+            draft.GiftsAtCart.Clear(); // ריקון הסל
+            draft.Status = PurchaseStatus.Completed;
+
+            _repo.Update(draft);
+
+            // פתיחת טיוטה חדשה אוטומטית למשתמש
+            _repo.GetOrCreateDraft(buyerId);
+
+            return _mapper.Map<PurchaseDto>(draft);
         }
 
-        public IEnumerable<PurchaseDto> GetAll()
-        {
-            var entities = _repository.GetAll();
-            return _mapper.Map<IEnumerable<PurchaseDto>>(entities);
-        }
+        public PurchaseDto? GetById(int id) => _mapper.Map<PurchaseDto>(_repo.GetById(id));
 
-        public PurchaseDto? Delete(int id)
+        public void RemoveFromCart(AddToCartDto dto)
         {
-            var entity = _repository.Delete(id);
-            return entity == null ? null : _mapper.Map<PurchaseDto>(entity);
+            var draft = _repo.GetOrCreateDraft(dto.BuyerId);
+
+            // הסרת המופע הראשון של ה-GiftId מהרשימה
+            if (draft.GiftsAtCart.Contains(dto.GiftId))
+            {
+                draft.GiftsAtCart.Remove(dto.GiftId);
+                _repo.Update(draft);
+            }
         }
     }
 }

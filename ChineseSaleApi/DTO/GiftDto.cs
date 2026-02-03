@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ChineseSaleApi.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace ChineseSaleApi.DTO
 {
@@ -11,6 +12,8 @@ namespace ChineseSaleApi.DTO
         [StringLength(500, MinimumLength = 2)]
         public string Description { get; set; } = null!;
         [Required]
+        public string ImageUrl { get; set; }
+        [Required]
         public int DonorId { get; set; }
         [Required]
         public List<int> CategoryId { get; set; }
@@ -20,7 +23,9 @@ namespace ChineseSaleApi.DTO
         public int Id { get; set; }
         public string Title { get; set; } = null!;
         public string Description { get; set; } = null!;
-        public List<int> CategoryId { get; set; } = null!;
+        public string ImageUrl { get; set; }
+
+        public List<Category> Categories { get; set; } = null!;
     }
 
 }

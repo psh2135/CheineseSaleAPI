@@ -6,58 +6,42 @@ namespace ChineseSaleApi.Repositories
 {
     public interface IPurchaseRepository
     {
-        Purchase Create(Purchase purchase);
+        Purchase GetOrCreateDraft(int buyerId);
+        void Update(Purchase purchase);
         Purchase? GetById(int id);
         IEnumerable<Purchase> GetAll();
-        Purchase Update(Purchase purchase);
-        Purchase? Delete(int id);
     }
 
     public class PurchaseRepository : IPurchaseRepository
     {
         private readonly AppDbContext _context;
+        public PurchaseRepository(AppDbContext context) => _context = context;
 
-        public PurchaseRepository(AppDbContext context)
+        public Purchase GetOrCreateDraft(int buyerId)
         {
-            _context = context;
+            var draft = _context.Purchases
+                .Include(p => p.Tickets)
+                .FirstOrDefault(p => p.BuyerId == buyerId && p.Status == PurchaseStatus.Draft);
+
+            if (draft == null)
+            {
+                draft = new Purchase { BuyerId = buyerId, Status = PurchaseStatus.Draft };
+                _context.Purchases.Add(draft);
+                _context.SaveChanges();
+            }
+            return draft;
         }
 
-        public Purchase Create(Purchase purchase)
-        {
-            _context.Purchases.Add(purchase);
-            _context.SaveChanges();
-            return purchase;
-        }
+        public Purchase? GetById(int id) =>
+            _context.Purchases.Include(p => p.Tickets).ThenInclude(t => t.Gift).FirstOrDefault(p => p.Id == id);
 
-        public Purchase? GetById(int id)
-        {
-            return _context.Purchases
-                .Include(p => p.Packages)
-                .FirstOrDefault(p => p.Id == id);
-        }
+        public IEnumerable<Purchase> GetAll() =>
+            _context.Purchases.Include(p => p.Tickets).ToList();
 
-        public IEnumerable<Purchase> GetAll()
-        {
-            return _context.Purchases
-                .Include(p => p.Packages)
-                .ToList();
-        }
-
-        public Purchase Update(Purchase purchase)
+        public void Update(Purchase purchase)
         {
             _context.Purchases.Update(purchase);
             _context.SaveChanges();
-            return purchase;
-        }
-
-        public Purchase? Delete(int id)
-        {
-            var purchase = _context.Purchases.FirstOrDefault(p => p.Id == id);
-            if (purchase == null) return null;
-
-            _context.Purchases.Remove(purchase);
-            _context.SaveChanges();
-            return purchase;
         }
     }
 }

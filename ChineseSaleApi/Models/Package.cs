@@ -9,6 +9,6 @@ namespace ChineseSaleApi.Models
         public decimal Price { get; set; }
         public int TicketsCount { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
+        //public ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
     }
 }

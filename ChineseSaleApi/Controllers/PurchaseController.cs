@@ -5,43 +5,38 @@ using Microsoft.AspNetCore.Mvc;
 namespace ChineseSaleApi.Controllers
 {
     [ApiController]
-    [Route("api/purchases")]
-    public class PurchaseController : ControllerBase
+    [Route("api/cart")]
+    public class CartController : ControllerBase
     {
         private readonly IPurchaseService _service;
+        public CartController(IPurchaseService service) => _service = service;
 
-        public PurchaseController(IPurchaseService service)
+        [HttpPost("add")]
+        public IActionResult AddToCart([FromBody] AddToCartDto dto)
         {
-            _service = service;
+            _service.AddToCart(dto);
+            return Ok(new { message = "נוסף לסל בהצלחה" });
         }
 
-        [HttpPost]
-        public IActionResult Create([FromBody] CreatePurchaseDto dto)
+        [HttpPost("checkout/{buyerId}")]
+        public IActionResult Checkout(int buyerId)
         {
-            var result = _service.Create(dto);
-            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+            var purchase = _service.CompletePurchase(buyerId);
+            return Ok(purchase);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public IActionResult GetPurchase(int id)
         {
-            var result = _service.GetById(id);
-            if (result == null) return NotFound();
-            return Ok(result);
+            var res = _service.GetById(id);
+            return res != null ? Ok(res) : NotFound();
         }
 
-        [HttpGet]
-        public IActionResult GetAll()
+        [HttpDelete("remove")]
+        public IActionResult RemoveFromCart([FromBody] AddToCartDto dto)
         {
-            return Ok(_service.GetAll());
-        }
-
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
-        {
-            var result = _service.Delete(id);
-            if (result == null) return NotFound();
-            return Ok(result);
+            _service.RemoveFromCart(dto);
+            return Ok(new { message = "הכרטיס הוסר מהסל בהצלחה" });
         }
     }
 }

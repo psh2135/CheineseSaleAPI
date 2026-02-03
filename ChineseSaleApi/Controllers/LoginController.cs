@@ -27,9 +27,9 @@ namespace ChineseSaleApi.Controllers
         {
             var claims = new[]
             {
-        new Claim(ClaimTypes.Name, "managerUser"),
-        new Claim(ClaimTypes.Role, "Manager")
-    };
+                new Claim(ClaimTypes.Name, "managerUser"),
+                new Claim(ClaimTypes.Role, "Manager")
+            };
 
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes("SUPER_SECRET_KEY_123456_SUPER_SECRET_KEY_123456"));

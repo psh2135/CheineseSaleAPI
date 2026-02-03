@@ -8,6 +8,7 @@ namespace ChineseSaleApi.Repositories
     {
         Gift? GetGiftById(int giftId);
         List<Ticket> GetTicketsByGift(int giftId);
+        IEnumerable<Gift> GetAllDrawnGifts();
         void Save();
     }
 }
@@ -36,6 +37,15 @@ namespace ChineseSaleApi.Repositories
             return _context.Tickets
                 .Include(t => t.Purchase)
                 .Where(t => t.GiftId == giftId)
+                .ToList();
+        }
+
+        public IEnumerable<Gift> GetAllDrawnGifts()
+        {
+            return _context.Gifts
+                .Include(g => g.Winner) // טעינת המשתמש שזכה
+                .Where(g => g.IsDrawn == true)
+                .AsNoTracking()
                 .ToList();
         }
 

@@ -2,9 +2,6 @@
 using ChineseSaleApi.DTO;
 using ChineseSaleApi.DTO.ChineseSaleApi.DTO;
 using ChineseSaleApi.DTO.ChineseSaleApi.DTOs;
-
-
-//using ChineseSaleApi.DTO.ChineseSaleApi.DTO;
 using ChineseSaleApi.Models;
 
 namespace ChineseSaleApi.Mapping
@@ -14,42 +11,29 @@ namespace ChineseSaleApi.Mapping
         public MappingProfile()
         {
             //user
-            CreateMap<UserDto, User>();
-            CreateMap<User, UserDto>();
+            CreateMap<UserDto, User>().ReverseMap();
             CreateMap<CreateUserDto, User>()
-     .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
+            .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
             CreateMap<User, CreateUserDto>();
-            
+
             //gift
             CreateMap<GiftDto, Gift>();
-            CreateMap<Gift, GiftDto>();
-            CreateMap<CreateGiftDto, Gift>();
-            CreateMap<Gift, CreateGiftDto>();
+            CreateMap<Gift, GiftDto>()
+             .ForMember(dest => dest.Categories, opt => opt.MapFrom(src => src.Categories));
+            CreateMap<CreateGiftDto, Gift>().ReverseMap();
 
             //category
-            CreateMap<CategoryDto, Category>();
-            CreateMap<Category, CategoryDto>();
-            CreateMap<CreateCategoryDto, Category>();
-            CreateMap<Category, CreateCategoryDto>();
-            //lottery
-            //CreateMap<RunLotteryDto, LotteryResult>();
-            //CreateMap<LotteryResult, RunLotteryDto>();
-            //CreateMap<LotteryResultDto, LotteryResult>();
-            //CreateMap<LotteryResult, LotteryResultDto>();
+            CreateMap<CategoryDto, Category>().ReverseMap();
+            CreateMap<CreateCategoryDto, Category>().ReverseMap();
 
-            //package
-            CreateMap<PackageDto, Package>();
-            CreateMap<Package, PackageDto>();
-            CreateMap<CreatePackageDto, Package>();
-            CreateMap<Package, CreatePackageDto>();
+            CreateMap<Ticket, TicketDto>()
+                .ForMember(d => d.GiftName, o => o.MapFrom(s => s.Gift != null ? s.Gift.Title : ""));
 
             //purches
-            CreateMap<CreatePurchaseDto, Purchase>();
-            CreateMap<Purchase, PurchaseDto>();
-
-            //ticket
-            CreateMap<CreateTicketDto, Ticket>();
-            CreateMap<Ticket, TicketDto>();
+            CreateMap<CreatePurchaseDto, Purchase>().ReverseMap();
+            CreateMap<Purchase, PurchaseDto>()
+                .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.ToString()))
+                .ForMember(d => d.Tickets, o => o.MapFrom(s => s.Tickets));
 
             CreateMap<Ticket, TicketAdminDto>()
                 .ForMember(d => d.TicketId, o => o.MapFrom(s => s.Id))
@@ -58,9 +42,10 @@ namespace ChineseSaleApi.Mapping
                 .ForMember(d => d.PurchaseId, o => o.MapFrom(s => s.PurchaseId))
                 .ForMember(d => d.CreatedAt, o => o.MapFrom(s => s.CreatedAt));
 
-
-
-        }
+            CreateMap<Gift, LotteryResultDto>()
+                .ForMember(dest => dest.GiftTitle, opt => opt.MapFrom(src => src.Title))
+                .ForMember(dest => dest.WinnerName, opt => opt.MapFrom(src =>
+                    src.Winner != null ? $"{src.Winner.UserName}" : "טרם הוגרל"));
+        }   
     }
-
 }

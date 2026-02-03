@@ -7,6 +7,7 @@ namespace ChineseSaleApi.Models
         public int Id { get; set; }
         public string Title { get; set; } = null!;
         public string Description { get; set; } = null!;
+        public string ImageUrl { get; set; } = null!;
         public int DonorId { get; set; }
         public User Donor { get; set; } = null!;
         public ICollection<Category> Categories { get; set; } = null!;
