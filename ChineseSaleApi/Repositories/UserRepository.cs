@@ -12,7 +12,7 @@ namespace ChineseSaleApi.Repositories
     {
         User GetById(int id);
         User GetByEmail(string email);
-        IEnumerable<User> GetUsersByRole(string role); // פונקציה גנרית לקבלת משתמשים לפי תפקיד
+        IEnumerable<User> GetUsersByRole(UserRole role); 
         void Add(User user);
         bool Save();
     }
@@ -32,7 +32,7 @@ namespace ChineseSaleApi.Repositories
             return _context.Users.FirstOrDefault(u => u.Email == email);
         }
 
-        public IEnumerable<User> GetUsersByRole(string role)
+        public IEnumerable<User> GetUsersByRole(UserRole role)
         {
             return _context.Users.Where(u => u.Role == role).ToList();
         }

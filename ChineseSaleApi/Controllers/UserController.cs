@@ -60,7 +60,6 @@ namespace ChineseSaleApi.Controllers
         private readonly IUserService _service;
         public AuthController(IUserService service) => _service = service;
 
-        // הרשמה פתוחה לכולם - אין צורך בטוקן
         [AllowAnonymous]
         [HttpPost("register")]
         public ActionResult<UserDto> Register(CreateUserDto dto)

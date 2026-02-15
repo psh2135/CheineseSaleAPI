@@ -14,6 +14,8 @@ namespace ChineseSaleApi.DTO
         [Required]
         public string ImageUrl { get; set; }
         [Required]
+        public decimal Price { get; set; }
+        [Required]
         public int DonorId { get; set; }
         [Required]
         public List<int> CategoryId { get; set; }
@@ -24,8 +26,11 @@ namespace ChineseSaleApi.DTO
         public string Title { get; set; } = null!;
         public string Description { get; set; } = null!;
         public string ImageUrl { get; set; }
+        public decimal Price { get; set; } = 0;
+        public bool IsDrawn { get; set; } = false;
 
         public List<Category> Categories { get; set; } = null!;
+        
     }
 
 }

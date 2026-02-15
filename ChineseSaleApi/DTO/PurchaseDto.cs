@@ -12,7 +12,7 @@ namespace ChineseSaleApi.DTO
     }
     public class AddToCartDto
     {
-        public int BuyerId { get; set; }
+        [Required]
         public int GiftId { get; set; }
     }
     public class PurchaseDto
@@ -20,7 +20,13 @@ namespace ChineseSaleApi.DTO
         public int Id { get; set; }
         public string Status { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
+        public decimal TotalPrice { get; set; }
         public List<TicketDto> Tickets { get; set; } = new();
     }
-    
+    public class AdminDashboardDto
+    {
+        public decimal TotalRevenue { get; set; }
+        public int TotalTicketsSold { get; set; }
+        public int TotalParticipants { get; set;}
+    }
 }

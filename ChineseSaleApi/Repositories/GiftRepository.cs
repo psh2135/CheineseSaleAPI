@@ -6,11 +6,15 @@ using System.Linq;
 public interface IGiftRepository
 {
     Gift Add(Gift gift);
+    void Update(Gift gift);
+    void Delete(Gift gift);
     Gift? GetById(int id);
     IEnumerable<Gift> GetAll();
     IEnumerable<Gift> GetByCategory(int categoryId);
-    void Update(Gift gift);
-    void Delete(Gift gift);
+    IEnumerable<object> GetMostPopularGifts();
+    IEnumerable<Gift> GetMostExpensiveGift();
+    User? GetWinner(int id);
+   
 }
 public class GiftRepository : IGiftRepository
 {
@@ -27,7 +31,15 @@ public class GiftRepository : IGiftRepository
         return gift;
 
     }
+    public void Update(Gift gift)
+    {
+        _context.Gifts.Update(gift);
+    }
 
+    public void Delete(Gift gift)
+    {
+        _context.Gifts.Remove(gift);
+    }
     public Gift? GetById(int id)
     {
         return _context.Gifts
@@ -50,13 +62,33 @@ public class GiftRepository : IGiftRepository
             .AsNoTracking()
             .ToList();
     }
-    public void Update(Gift gift)
+    public IEnumerable<object> GetMostPopularGifts()
     {
-        _context.Gifts.Update(gift);
+        return _context.Gifts
+            .Select(g => new
+            {
+                GiftName = g.Title,
+                TicketCount = g.Tickets.Count
+            })
+            .OrderByDescending(x => x.TicketCount)
+            .ToList();
+    }
+    public IEnumerable<Gift> GetMostExpensiveGift()
+    {
+        var maxPrice = _context.Gifts.Max(g => g.Price);
+
+        return _context.Gifts
+            .Where(g => g.Price == maxPrice)
+            .ToList();
     }
 
-    public void Delete(Gift gift)
+    public User? GetWinner(int id)
     {
-        _context.Gifts.Remove(gift);
+        return _context.Gifts
+            .Where(g => g.Id == id)
+            .Select(g => g.Winner)
+            .FirstOrDefault();
     }
+
+
 }

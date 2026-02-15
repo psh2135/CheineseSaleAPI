@@ -6,7 +6,6 @@ namespace ChineseSaleApi.Repositories
 {
     public interface ITicketRepository
     {
-        Ticket Create(Ticket ticket);
         IEnumerable<Ticket> GetByGift(int giftId);
         IEnumerable<Ticket> GetByBuyer(int buyerId);
         IEnumerable<Ticket> GetAll();
@@ -21,12 +20,6 @@ namespace ChineseSaleApi.Repositories
             _context = context;
         }
 
-        public Ticket Create(Ticket ticket)
-        {
-            _context.Tickets.Add(ticket);
-            _context.SaveChanges();
-            return ticket;
-        }
 
         public IEnumerable<Ticket> GetByGift(int giftId)
         {

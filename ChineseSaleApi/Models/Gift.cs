@@ -11,6 +11,7 @@ namespace ChineseSaleApi.Models
         public int DonorId { get; set; }
         public User Donor { get; set; } = null!;
         public ICollection<Category> Categories { get; set; } = null!;
+        public decimal Price { get; set; } = decimal.Zero;
         // הגרלה
         public bool IsDrawn { get; set; } = false;
         public int? WinnerUserId { get; set; }

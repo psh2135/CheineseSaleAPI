@@ -31,11 +31,11 @@ namespace ChineseSaleApi.Services
             _config = config;
         }
 
-        public UserDto Register(CreateUserDto dto) => CreateUserWithRole(dto, "Buyer");
+        public UserDto Register(CreateUserDto dto) => CreateUserWithRole(dto, UserRole.Buyer);
 
-        public UserDto AddDonor(CreateUserDto dto) => CreateUserWithRole(dto, "Donor");
+        public UserDto AddDonor(CreateUserDto dto) => CreateUserWithRole(dto, UserRole.Donor);
 
-        private UserDto CreateUserWithRole(CreateUserDto dto, string role)
+        private UserDto CreateUserWithRole(CreateUserDto dto, UserRole role)
         {
             var user = _mapper.Map<User>(dto);
 
@@ -62,7 +62,7 @@ namespace ChineseSaleApi.Services
 
         public IEnumerable<UserDto> GetAllDonors()
         {
-            var donors = _repo.GetUsersByRole("Donor");
+            var donors = _repo.GetUsersByRole(UserRole.Donor);
 
             return _mapper.Map<IEnumerable<UserDto>>(donors);
         }
@@ -70,10 +70,10 @@ namespace ChineseSaleApi.Services
         private string GenerateJwtToken(User user)
         {
             var claims = new List<Claim> {
-        new Claim(ClaimTypes.Name, user.UserName),
-        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new Claim(ClaimTypes.Role, user.Role) 
-    };
+            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Role, user.Role.ToString()) 
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

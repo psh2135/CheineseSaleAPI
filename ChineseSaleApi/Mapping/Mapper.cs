@@ -12,9 +12,16 @@ namespace ChineseSaleApi.Mapping
         {
             //user
             CreateMap<UserDto, User>().ReverseMap();
+
             CreateMap<CreateUserDto, User>()
-            .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
-            CreateMap<User, CreateUserDto>();
+                .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(_ => UserRole.Buyer));
+
+            CreateMap<CreateDonorDto, User>()
+                .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(_ => UserRole.Donor));
+
+
 
             //gift
             CreateMap<GiftDto, Gift>();

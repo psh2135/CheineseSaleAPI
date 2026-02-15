@@ -7,6 +7,7 @@ namespace ChineseSaleApi.Controllers
 {
     [ApiController]
     [Route("api/tickets")]
+    [Authorize]
     public class TicketController : ControllerBase
     {
         private readonly ITicketService _service;
@@ -16,22 +17,14 @@ namespace ChineseSaleApi.Controllers
             _service = service;
         }
 
-        [HttpPost]
-        public IActionResult Create(CreateTicketDto dto)
-        {
-            return Ok(_service.Create(dto));
-        }
+        
         [HttpGet("gift/{giftId}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetByGift(int giftId)
         {
             return Ok(_service.GetByGift(giftId));
         }
 
-        [HttpGet("buyer/{buyerId}")]
-        public IActionResult GetByBuyer(int buyerId)
-        {
-            return Ok(_service.GetByBuyer(buyerId));
-        }
 
         [HttpGet("admin")]
         public IActionResult GetAll()

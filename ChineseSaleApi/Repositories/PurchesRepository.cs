@@ -10,6 +10,13 @@ namespace ChineseSaleApi.Repositories
         void Update(Purchase purchase);
         Purchase? GetById(int id);
         IEnumerable<Purchase> GetAll();
+        IEnumerable<Purchase> GetCompleted();
+        IEnumerable<Package> GetAllPackages();
+        IEnumerable<Purchase> GetUserPurchaseHistory(int buyerId);
+        decimal GetTotalRevenue();
+        int GetTotalTicketsCount();
+        int GetUniqueParticipantsCount();
+
     }
 
     public class PurchaseRepository : IPurchaseRepository
@@ -42,6 +49,49 @@ namespace ChineseSaleApi.Repositories
         {
             _context.Purchases.Update(purchase);
             _context.SaveChanges();
+        }
+
+
+        public IEnumerable<Purchase> GetCompleted()
+        {
+            return _context.Purchases.Where(p => p.Status == PurchaseStatus.Completed).ToList();
+        }
+
+
+        public int GetTotalTicketsCount()
+        {
+            return _context.Tickets.Count();
+        }
+
+        public int GetUniqueParticipantsCount()
+        {
+            return _context.Purchases
+                .Where(p => p.Status == PurchaseStatus.Completed)
+                .Select(p => p.BuyerId)
+                .Distinct()
+                .Count();
+        }
+
+        public IEnumerable<Package> GetAllPackages()
+        {
+            return _context.Packages
+                .AsNoTracking()
+                .ToList();
+        }
+        public IEnumerable<Purchase> GetUserPurchaseHistory(int buyerId)
+        {
+            return _context.Purchases
+                .Include(p => p.Tickets)
+                    .ThenInclude(t => t.Gift)
+                .Where(p => p.BuyerId == buyerId && p.Status == PurchaseStatus.Completed)
+                .OrderByDescending(p => p.CreatedAt)
+                .ToList();
+        }
+        public decimal GetTotalRevenue()
+        {
+            return _context.Purchases
+                .Where(p => p.Status == PurchaseStatus.Completed)
+                .Sum(p => p.TotalPrice);
         }
     }
 }

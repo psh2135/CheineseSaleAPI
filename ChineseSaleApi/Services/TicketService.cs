@@ -8,7 +8,6 @@ namespace ChineseSaleApi.Services
 {
     public interface ITicketService
     {
-        TicketDto Create(CreateTicketDto dto);
         IEnumerable<TicketDto> GetByGift(int giftId);
         IEnumerable<TicketDto> GetByBuyer(int buyerId);
         IEnumerable<TicketAdminDto> GetAll();
@@ -25,12 +24,6 @@ namespace ChineseSaleApi.Services
             _mapper = mapper;
         }
 
-        public TicketDto Create(CreateTicketDto dto)
-        {
-            var ticket = _mapper.Map<Ticket>(dto);
-            var saved = _repository.Create(ticket);
-            return _mapper.Map<TicketDto>(saved);
-        }
 
         public IEnumerable<TicketDto> GetByGift(int giftId)
         {

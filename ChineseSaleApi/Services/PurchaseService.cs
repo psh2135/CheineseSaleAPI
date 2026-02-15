@@ -2,15 +2,19 @@
 using ChineseSaleApi.DTO;
 using ChineseSaleApi.Models;
 using ChineseSaleApi.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChineseSaleApi.Services
 {
     public interface IPurchaseService
     {
-        void AddToCart(AddToCartDto dto);
+        Task AddToCartAsync(int buyerId, AddToCartDto dto);
         PurchaseDto CompletePurchase(int buyerId);
         PurchaseDto? GetById(int id);
-        void RemoveFromCart(AddToCartDto dto);
+        void RemoveFromCart(int buyerId, AddToCartDto dto);
+        IEnumerable<Package> GetAllPackages();
+        IEnumerable<PurchaseDto> GetUserTickets(int buyerId);
+        AdminDashboardDto GetAdminDashboardStats();
     }
 
     public class PurchaseService : IPurchaseService
@@ -24,39 +28,64 @@ namespace ChineseSaleApi.Services
             _mapper = mapper;
         }
 
-        public void AddToCart(AddToCartDto dto)
+        public async Task AddToCartAsync(int buyerId, AddToCartDto dto)
         {
-            var draft = _repo.GetOrCreateDraft(dto.BuyerId);
+            var draft = _repo.GetOrCreateDraft(buyerId);
+
             draft.GiftsAtCart.Add(dto.GiftId);
+
             _repo.Update(draft);
         }
 
         public PurchaseDto CompletePurchase(int buyerId)
         {
             var draft = _repo.GetOrCreateDraft(buyerId);
-
+            if (!draft.GiftsAtCart.Any()) throw new Exception("Cart is empty");
+           
+            // 1. חישוב המחיר
+            int totalTicketsInCart = draft.GiftsAtCart.Count;
+            draft.TotalPrice = CalculateBestPrice(totalTicketsInCart);
+            
             // המרת ה-IDs מהסל לכרטיסים ממשיים
             foreach (var giftId in draft.GiftsAtCart)
             {
                 draft.Tickets.Add(new Ticket { GiftId = giftId });
             }
 
-            draft.GiftsAtCart.Clear(); // ריקון הסל
+            draft.GiftsAtCart.Clear(); 
             draft.Status = PurchaseStatus.Completed;
 
             _repo.Update(draft);
 
-            // פתיחת טיוטה חדשה אוטומטית למשתמש
             _repo.GetOrCreateDraft(buyerId);
 
             return _mapper.Map<PurchaseDto>(draft);
         }
+        private decimal CalculateBestPrice(int ticketCount)
+        {
+            // שליפת כל החבילות מה-DB ומיונן מהגדולה לקטנה
+            var packages = _repo.GetAllPackages().OrderByDescending(p => p.TicketsCount).ToList();
+            decimal totalPrice = 0;
+            int remainingTickets = ticketCount;
+
+            foreach (var package in packages)
+            {
+                if (remainingTickets >= package.TicketsCount && package.TicketsCount > 0)
+                {
+                    int numPackages = remainingTickets / package.TicketsCount;
+                    totalPrice += numPackages * package.Price;
+                    remainingTickets %= package.TicketsCount;
+                }
+            }
+
+            return totalPrice;
+        }
 
         public PurchaseDto? GetById(int id) => _mapper.Map<PurchaseDto>(_repo.GetById(id));
 
-        public void RemoveFromCart(AddToCartDto dto)
+        public void RemoveFromCart(int buyerId, AddToCartDto dto)
         {
-            var draft = _repo.GetOrCreateDraft(dto.BuyerId);
+            var draft = _repo.GetOrCreateDraft(buyerId);
 
             // הסרת המופע הראשון של ה-GiftId מהרשימה
             if (draft.GiftsAtCart.Contains(dto.GiftId))
@@ -64,6 +93,26 @@ namespace ChineseSaleApi.Services
                 draft.GiftsAtCart.Remove(dto.GiftId);
                 _repo.Update(draft);
             }
+        }
+        public IEnumerable<Package> GetAllPackages()
+        {
+            return _repo.GetAllPackages();
+        }
+        public IEnumerable<PurchaseDto> GetUserTickets(int buyerId)
+        {
+            var history = _repo.GetUserPurchaseHistory(buyerId);
+            return _mapper.Map<IEnumerable<PurchaseDto>>(history);
+        }
+        
+
+        public AdminDashboardDto GetAdminDashboardStats()
+        {
+            return new AdminDashboardDto
+            {
+                TotalRevenue = _repo.GetTotalRevenue(),
+                TotalTicketsSold = _repo.GetTotalTicketsCount(),
+                TotalParticipants = _repo.GetUniqueParticipantsCount()
+            };
         }
     }
 }

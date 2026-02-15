@@ -26,9 +26,13 @@ namespace ChineseSaleApi.Data
                 entity.Property(u => u.UserName).HasMaxLength(50).IsRequired();
                 entity.Property(u => u.Email).HasMaxLength(100).IsRequired();
                 entity.Property(u => u.PasswordHash).HasMaxLength(256).IsRequired();
-                entity.Property(u => u.Role).HasMaxLength(20).IsRequired().HasDefaultValue("Buyer");
+                entity.Property(u => u.Role).HasMaxLength(20).IsRequired().HasDefaultValue(UserRole.Buyer);
                 entity.HasIndex(u => u.Email).IsUnique();
             });
+            modelBuilder.Entity<User>()
+            .Property(u => u.Role)
+            .HasConversion<int>()
+            .IsRequired();
 
             // --- Gift ---
             modelBuilder.Entity<Gift>(entity =>
@@ -71,7 +75,8 @@ namespace ChineseSaleApi.Data
                       .HasConversion(
                           v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                           v => JsonSerializer.Deserialize<List<int>>(v, (JsonSerializerOptions?)null) ?? new List<int>()
-                      );
+                      )
+                      .HasMaxLength(10000);
             });
 
             // --- Ticket ---

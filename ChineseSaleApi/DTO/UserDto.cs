@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ChineseSaleApi.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace ChineseSaleApi.DTO
 {
@@ -19,8 +20,17 @@ namespace ChineseSaleApi.DTO
         public int Id { get; set; }
         public string UserName { get; set; } = null!;
         public string Email { get; set; } = null!;
-        public string Role { get; set; } = null!;
-        public string Token { get; set; } = null!; // השדה החדש
+        public UserRole Role { get; set; } = UserRole.Buyer;
+        public string Token { get; set; } = null!;
+    }
+    public class CreateDonorDto
+    {
+        [Required]
+        [StringLength(50, MinimumLength = 5)]
+        public string UserName { get; set; } = null!;
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = null!;
     }
 
 }

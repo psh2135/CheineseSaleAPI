@@ -74,19 +74,7 @@ namespace ChineseSaleApi.Controllers
         {
             _giftService = giftService;
         }
-
-        // POST: api/gifts
-        [HttpPost]
-        public ActionResult<GiftDto> CreateGift([FromBody] CreateGiftDto dto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var result = _giftService.CreateGift(dto);
-            return CreatedAtAction(nameof(GetGiftById), new { id = result.Id }, result);
-        }
-
-        // GET: api/gifts
+        //כולם
         [HttpGet]
         [AllowAnonymous]
         public ActionResult<IEnumerable<GiftDto>> GetAllGifts()
@@ -95,7 +83,6 @@ namespace ChineseSaleApi.Controllers
             return Ok(gifts);
         }
 
-        // GET: api/gifts/{id}
         [HttpGet("{id}")]
         [AllowAnonymous]
         public ActionResult<GiftDto> GetGiftById(int id)
@@ -106,14 +93,27 @@ namespace ChineseSaleApi.Controllers
 
             return Ok(gift);
         }
+
         [HttpGet("category/{categoryId}")]
+        [AllowAnonymous]
         public IActionResult GetByCategory(int categoryId)
         {
             var results = _giftService.GetGiftsByCategory(categoryId);
             return Ok(results);
         }
 
-        // PUT: api/gifts/{id}
+        //רק מנהל
+        [HttpPost]
+        public ActionResult<GiftDto> CreateGift([FromBody] CreateGiftDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = _giftService.CreateGift(dto);
+            return CreatedAtAction(nameof(GetGiftById), new { id = result.Id }, result);
+        }
+       
+
         [HttpPut("{id}")]
         public ActionResult<GiftDto> UpdateGift(int id, [FromBody] GiftDto dto)
         {
@@ -127,7 +127,6 @@ namespace ChineseSaleApi.Controllers
             return Ok(updated);
         }
 
-        // DELETE: api/gifts/{id}
         [HttpDelete("{id}")]
         public IActionResult DeleteGift(int id)
         {
@@ -137,6 +136,12 @@ namespace ChineseSaleApi.Controllers
 
             _giftService.DeleteGift(id);
             return NoContent();
+        }
+        [HttpGet("most-popular")]
+        public IActionResult GetMostPopularGifts()
+        {
+            var stats = _giftService.GetGiftsStatistics();
+            return Ok(stats);
         }
     }
 }
