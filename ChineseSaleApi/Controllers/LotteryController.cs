@@ -25,6 +25,15 @@ namespace ChineseSaleApi.Controllers
             _stateService.StartRaffle();
             return Ok();
         }
+        [HttpGet("status")]
+        public IActionResult GetRaffleStatus()
+        {
+            return Ok(new
+            {
+                isLocked = _stateService.IsRaffleLocked()
+            });
+        }
+
 
         [HttpPost("run")]
         [Authorize(Roles = "Admin")]

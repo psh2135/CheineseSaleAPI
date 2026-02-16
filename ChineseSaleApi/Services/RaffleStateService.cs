@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 public interface IRaffleStateService
 {
     bool IsRaffleLocked();
+    void StartRaffle();
 }
 
 
@@ -28,4 +29,17 @@ public class RaffleStateService : IRaffleStateService
         var raffle = _repo.GetCurrentRaffle();
         return DateTime.UtcNow >= raffle.OpeningDate;
     }
+    public void StartRaffle()
+    {
+        var raffle = _repo.GetCurrentRaffle();
+
+        if (raffle.IsLocked)
+            throw new InvalidOperationException("Already started");
+
+        raffle.OpeningDate = DateTime.UtcNow;
+
+        _repo.Save();
+    }
+
+
 }
