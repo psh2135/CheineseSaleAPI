@@ -6,7 +6,7 @@ using AutoMapper;
 public interface IGiftService
 {
     GiftDto CreateGift(CreateGiftDto dto);
-    GiftDto? UpdateGift(GiftDto dto);
+    GiftDto? UpdateGift(int id, UpdateGiftDto dto);
     void DeleteGift(int id);
     GiftDto? GetGiftById(int id);
     IEnumerable<GiftDto> GetAllGifts();
@@ -18,18 +18,21 @@ public interface IGiftService
 public class GiftService : IGiftService
 {
     private readonly IGiftRepository _repository;
+    private readonly IRaffleStateService _stateService;
     private readonly IMapper _mapper;
-    private readonly AppDbContext _context;
 
-    public GiftService(IGiftRepository repository, IMapper mapper, AppDbContext context)
+    public GiftService(IGiftRepository repository, IMapper mapper, IRaffleStateService stateService)
     {
         _repository = repository;
         _mapper = mapper;
-        _context = context;
+        _stateService = stateService;
     }
 
     public GiftDto CreateGift(CreateGiftDto dto)
     {
+        if (_stateService.IsRaffleLocked())
+            throw new InvalidOperationException("Raffle is locked");
+
         //_logger.LogInformation("Creating gift for DonorId={DonorId}", dto.DonorId);
 
         var gift = _mapper.Map<Gift>(dto);
@@ -42,24 +45,49 @@ public class GiftService : IGiftService
 
         return _mapper.Map<GiftDto>(gift);
     }
-    public GiftDto? UpdateGift(GiftDto dto)
+    public GiftDto? UpdateGift(int id, UpdateGiftDto dto)
     {
-        var gift = _repository.GetById(dto.Id);
+        if (_stateService.IsRaffleLocked())
+            throw new InvalidOperationException("Raffle is locked");
+
+        var gift = _repository.GetById(id);
         if (gift == null) return null;
 
-        _mapper.Map(dto, gift);
-        _context.SaveChanges();
+        // עדכון שדות פשוטים
+        gift.Title = dto.Title ?? gift.Title;
+        gift.Description = dto.Description ?? gift.Description;
+        gift.ImageUrl = dto.ImageUrl ?? gift.ImageUrl;
+        gift.Price = dto.Price ?? gift.Price;
+        gift.DonorId = dto.DonorId ?? gift.DonorId;
+
+        // עדכון קטגוריות בצורה נכונה
+        if (dto.CategoryIds != null)
+        {
+            gift.Categories.Clear();
+
+            var categories = _repository.GetCategoriesByIds(dto.CategoryIds);
+            foreach (var category in categories)
+            {
+                gift.Categories.Add(category);
+            }
+        }
+
+        _repository.Update(gift);
 
         return _mapper.Map<GiftDto>(gift);
     }
 
+
     public void DeleteGift(int id)
     {
+        if (_stateService.IsRaffleLocked())
+            throw new InvalidOperationException("Raffle is locked");
+
+
         var gift = _repository.GetById(id);
         if (gift == null) return;
 
         _repository.Delete(gift);
-        _context.SaveChanges();
     }
     public GiftDto? GetGiftById(int id)
     {

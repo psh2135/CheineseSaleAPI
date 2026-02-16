@@ -178,6 +178,9 @@ builder.Services.AddCors(options => {
               .AllowAnyHeader();
     });
 });
+builder.Services.AddScoped<IRaffleStateService, RaffleStateService>();
+builder.Services.AddScoped<RaffleRepository>();
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 

@@ -115,12 +115,9 @@ namespace ChineseSaleApi.Controllers
        
 
         [HttpPut("{id}")]
-        public ActionResult<GiftDto> UpdateGift(int id, [FromBody] GiftDto dto)
+        public ActionResult<GiftDto> UpdateGift(int id, [FromBody] UpdateGiftDto dto)
         {
-            if (id != dto.Id)
-                return BadRequest("ID mismatch");
-
-            var updated = _giftService.UpdateGift(dto);
+          var updated = _giftService.UpdateGift(id, dto);
             if (updated == null)
                 return NotFound();
 

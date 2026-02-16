@@ -26,12 +26,12 @@ namespace ChineseSaleApi.Controllers
         }
 
         [HttpPost("checkout")]
-        public IActionResult Checkout()
+        public async Task<IActionResult> Checkout()
         {
             if (!TryGetUserId(out int buyerId))
                 return Unauthorized();
 
-            var purchase = _service.CompletePurchase(buyerId);
+            var purchase = await _service.CompletePurchase(buyerId);
             return Ok(purchase);
         }
 

@@ -20,12 +20,14 @@ public interface ICategoryService
 public class CategoryService : ICategoryService
 {
     private readonly ICategoryRepository _repository;
+    private readonly IRaffleStateService _stateService;
     private readonly IMapper _mapper;
 
-    public CategoryService(ICategoryRepository repository, IMapper mapper)
+    public CategoryService(ICategoryRepository repository, IMapper mapper, IRaffleStateService stateService)
     {
         _repository = repository;
         _mapper = mapper;
+        _stateService = stateService;
     }
 
     public IEnumerable<CategoryDto> GetAllCategories()
@@ -42,6 +44,9 @@ public class CategoryService : ICategoryService
 
     public CategoryDto CreateCategory(CreateCategoryDto categoryDto)
     {
+        if (_stateService.IsRaffleLocked())
+            throw new InvalidOperationException("Raffle is locked");
+
         var category = _mapper.Map<Category>(categoryDto);
         _repository.Add(category);
         _repository.Save();
@@ -50,23 +55,25 @@ public class CategoryService : ICategoryService
 
     public CategoryDto UpdateCategory(int id, CategoryDto categoryDto)
     {
-        // 1. שליפת הישות הקיימת מה-Repo
+        if (_stateService.IsRaffleLocked())
+            throw new InvalidOperationException("Raffle is locked");
+
         var existingCategory = _repository.GetById(id);
         if (existingCategory == null) return null;
 
-        // 2. עדכון הערכים מה-DTO לישות הקיימת (Mapping)
         _mapper.Map(categoryDto, existingCategory);
 
-        // 3. עדכון ב-Repo ושמירה
         _repository.Update(existingCategory);
         _repository.Save();
 
-        // 4. החזרת ה-DTO המעודכן
         return _mapper.Map<CategoryDto>(existingCategory);
     }
 
     public bool DeleteCategory(int id)
     {
+        if (_stateService.IsRaffleLocked())
+            throw new InvalidOperationException("Raffle is locked");
+
         var category = _repository.GetById(id);
         if (category == null) return false;
 

@@ -10,10 +10,20 @@ namespace ChineseSaleApi.Controllers
     public class LotteryController : ControllerBase
     {
         private readonly ILotteryService _service;
+        private readonly IRaffleStateService _stateService;
 
-        public LotteryController(ILotteryService service)
+
+        public LotteryController(ILotteryService service, IRaffleStateService stateService)
         {
             _service = service;
+            _stateService = stateService;
+        }
+        [Authorize(Roles = "Admin")]
+        [HttpPost("start")]
+        public IActionResult StartRaffle()
+        {
+            _stateService.StartRaffle();
+            return Ok();
         }
 
         [HttpPost("run")]

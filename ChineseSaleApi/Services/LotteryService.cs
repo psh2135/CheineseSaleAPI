@@ -13,16 +13,21 @@ namespace ChineseSaleApi.Services
     public class LotteryService : ILotteryService
     {
         private readonly ILotteryRepository _repository;
+        private readonly IRaffleStateService _stateService;
         private readonly IMapper _mapper;
 
-        public LotteryService(ILotteryRepository repository, IMapper mapper)
+        public LotteryService(ILotteryRepository repository, IMapper mapper, IRaffleStateService stateService)
         {
             _repository = repository;
             _mapper = mapper;
+            _stateService = stateService;
         }
 
         public LotteryResultDto RunLottery(RunLotteryDto dto)
         {
+            if (!_stateService.IsRaffleLocked())
+                throw new InvalidOperationException("Raffle is not locked");
+
             var gift = _repository.GetGiftById(dto.GiftId);
 
             if (gift == null)

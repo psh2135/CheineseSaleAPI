@@ -22,18 +22,27 @@ namespace ChineseSaleApi.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _repo;
+        private readonly IRaffleStateService _stateService;
         private readonly IMapper _mapper;
         private readonly IConfiguration _config;
-        public UserService(IUserRepository repo, IMapper mapper, IConfiguration config)
+        public UserService(IUserRepository repo, IMapper mapper, IConfiguration config, IRaffleStateService stateService)
         {
             _repo = repo;
             _mapper = mapper;
             _config = config;
+            _stateService = stateService;
         }
 
         public UserDto Register(CreateUserDto dto) => CreateUserWithRole(dto, UserRole.Buyer);
 
-        public UserDto AddDonor(CreateUserDto dto) => CreateUserWithRole(dto, UserRole.Donor);
+        public UserDto AddDonor(CreateUserDto dto)
+        {
+
+            if (_stateService.IsRaffleLocked())
+                throw new InvalidOperationException("Raffle is locked");
+
+            return CreateUserWithRole(dto, UserRole.Donor);
+        }
 
         private UserDto CreateUserWithRole(CreateUserDto dto, UserRole role)
         {
@@ -72,7 +81,7 @@ namespace ChineseSaleApi.Services
             var claims = new List<Claim> {
             new Claim(ClaimTypes.Name, user.UserName),
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Role, user.Role.ToString()) 
+            new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));

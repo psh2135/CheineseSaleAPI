@@ -9,7 +9,7 @@ namespace ChineseSaleApi.Services
     public interface IPurchaseService
     {
         Task AddToCartAsync(int buyerId, AddToCartDto dto);
-        PurchaseDto CompletePurchase(int buyerId);
+        Task<PurchaseDto> CompletePurchase(int buyerId);
         PurchaseDto? GetById(int id);
         void RemoveFromCart(int buyerId, AddToCartDto dto);
         IEnumerable<Package> GetAllPackages();
@@ -22,16 +22,21 @@ namespace ChineseSaleApi.Services
     public class PurchaseService : IPurchaseService
     {
         private readonly IPurchaseRepository _repo;
+        private readonly IRaffleStateService _stateService;
         private readonly IMapper _mapper;
 
-        public PurchaseService(IPurchaseRepository repo, IMapper mapper)
+        public PurchaseService(IPurchaseRepository repo, IMapper mapper, IRaffleStateService stateService)
         {
             _repo = repo;
             _mapper = mapper;
+            _stateService = stateService;
         }
 
         public async Task AddToCartAsync(int buyerId, AddToCartDto dto)
         {
+            if (!_stateService.IsRaffleLocked())
+                throw new InvalidOperationException("Raffle is not locked");
+
             var draft = _repo.GetOrCreateDraft(buyerId);
 
             draft.GiftsAtCart.Add(dto.GiftId);
@@ -39,21 +44,32 @@ namespace ChineseSaleApi.Services
             _repo.Update(draft);
         }
 
-        public PurchaseDto CompletePurchase(int buyerId)
+        public async Task<PurchaseDto> CompletePurchase(int buyerId)
         {
+            if (!_stateService.IsRaffleLocked())
+                throw new InvalidOperationException("Raffle is not locked");
+
             var draft = _repo.GetOrCreateDraft(buyerId);
             if (!draft.GiftsAtCart.Any()) throw new Exception("Cart is empty");
-           
+
             // 1. חישוב המחיר
-            int totalTicketsInCart = draft.GiftsAtCart.Count;
-            draft.TotalPrice = CalculateBestPrice(totalTicketsInCart);
-            
-            // המרת ה-IDs מהסל לכרטיסים ממשיים
+            decimal totalPrice = 0;
+
             foreach (var giftId in draft.GiftsAtCart)
             {
+                var gift = await _repo.GetGiftByIdAsync(giftId); // או איך שאתה שולף Gift
+                if (gift == null)
+                    throw new Exception("Gift not found");
+
+                totalPrice += gift.Price;
+
                 draft.Tickets.Add(new Ticket { GiftId = giftId });
             }
 
+            draft.TotalPrice = totalPrice;
+
+
+           
             draft.GiftsAtCart.Clear(); 
             draft.Status = PurchaseStatus.Completed;
 
@@ -63,25 +79,7 @@ namespace ChineseSaleApi.Services
 
             return _mapper.Map<PurchaseDto>(draft);
         }
-        private decimal CalculateBestPrice(int ticketCount)
-        {
-            // שליפת כל החבילות מה-DB ומיונן מהגדולה לקטנה
-            var packages = _repo.GetAllPackages().OrderByDescending(p => p.TicketsCount).ToList();
-            decimal totalPrice = 0;
-            int remainingTickets = ticketCount;
-
-            foreach (var package in packages)
-            {
-                if (remainingTickets >= package.TicketsCount && package.TicketsCount > 0)
-                {
-                    int numPackages = remainingTickets / package.TicketsCount;
-                    totalPrice += numPackages * package.Price;
-                    remainingTickets %= package.TicketsCount;
-                }
-            }
-
-            return totalPrice;
-        }
+       
 
         public PurchaseDto? GetById(int id) => _mapper.Map<PurchaseDto>(_repo.GetById(id));
 

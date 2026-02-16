@@ -28,7 +28,7 @@ namespace ChineseSaleApi.Repositories
         public Gift? GetGiftById(int giftId)
         {
             return _context.Gifts
-                .Include(g => g.WinnerUserId)
+                .Include(g => g.Winner)
                 .FirstOrDefault(g => g.Id == giftId);
         }
 

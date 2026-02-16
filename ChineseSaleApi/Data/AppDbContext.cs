@@ -15,6 +15,7 @@ namespace ChineseSaleApi.Data
         public DbSet<Purchase> Purchases { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Raffle> Raffles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

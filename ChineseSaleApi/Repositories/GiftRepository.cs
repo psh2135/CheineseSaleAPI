@@ -30,17 +30,22 @@ public class GiftRepository : IGiftRepository
     public Gift Add(Gift gift)
     {
         _context.Gifts.Add(gift);
+        _context.SaveChanges();
         return gift;
 
     }
     public void Update(Gift gift)
     {
         _context.Gifts.Update(gift);
+        _context.SaveChanges();
+
     }
 
     public void Delete(Gift gift)
     {
         _context.Gifts.Remove(gift);
+        _context.SaveChanges();
+
     }
     public Gift? GetById(int id)
     {
