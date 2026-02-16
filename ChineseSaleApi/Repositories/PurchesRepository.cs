@@ -10,13 +10,15 @@ namespace ChineseSaleApi.Repositories
         void Update(Purchase purchase);
         Purchase? GetById(int id);
         IEnumerable<Purchase> GetAll();
-        IEnumerable<Purchase> GetCompleted();
+        Task<IEnumerable<Purchase>> GetCompleted();
         IEnumerable<Package> GetAllPackages();
         IEnumerable<Purchase> GetUserPurchaseHistory(int buyerId);
-        decimal GetTotalRevenue();
-        int GetTotalTicketsCount();
-        int GetUniqueParticipantsCount();
-
+        Task<decimal> GetTotalRevenue();
+        Task<int> GetTotalTicketsCount();
+        Task<int> GetUniqueParticipantsCount();
+        Task<Gift?> GetGiftByIdAsync(int giftId);
+        Task<Purchase?> GetDraftByBuyerIdAsync(int buyerId);
+        Task<IEnumerable<Gift>> GetGiftsByIdsAsync(List<int> ids);
     }
 
     public class PurchaseRepository : IPurchaseRepository
@@ -52,24 +54,24 @@ namespace ChineseSaleApi.Repositories
         }
 
 
-        public IEnumerable<Purchase> GetCompleted()
+        public async Task<IEnumerable<Purchase>> GetCompleted()
         {
-            return _context.Purchases.Where(p => p.Status == PurchaseStatus.Completed).ToList();
+            return await _context.Purchases.Where(p => p.Status == PurchaseStatus.Completed).ToListAsync();
         }
 
 
-        public int GetTotalTicketsCount()
+        public async Task<int> GetTotalTicketsCount()
         {
-            return _context.Tickets.Count();
+            return await _context.Tickets.CountAsync();
         }
 
-        public int GetUniqueParticipantsCount()
+        public async Task<int> GetUniqueParticipantsCount()
         {
-            return _context.Purchases
+            return await _context.Purchases
                 .Where(p => p.Status == PurchaseStatus.Completed)
                 .Select(p => p.BuyerId)
                 .Distinct()
-                .Count();
+                .CountAsync();
         }
 
         public IEnumerable<Package> GetAllPackages()
@@ -87,11 +89,33 @@ namespace ChineseSaleApi.Repositories
                 .OrderByDescending(p => p.CreatedAt)
                 .ToList();
         }
-        public decimal GetTotalRevenue()
+        public async Task<decimal> GetTotalRevenue()
         {
-            return _context.Purchases
+            return await _context.Purchases
                 .Where(p => p.Status == PurchaseStatus.Completed)
-                .Sum(p => p.TotalPrice);
+                .SumAsync(p => p.TotalPrice);
         }
+        public async Task<Gift?> GetGiftByIdAsync(int giftId)
+        {
+            return await _context.Gifts
+                .FirstOrDefaultAsync(g => g.Id == giftId);
+        }
+
+        public async Task<Purchase?> GetDraftByBuyerIdAsync(int buyerId)
+        {
+            return await _context.Purchases
+                .FirstOrDefaultAsync(p =>
+                    p.BuyerId == buyerId &&
+                    p.Status == PurchaseStatus.Draft);
+        }
+
+        public async Task<IEnumerable<Gift>> GetGiftsByIdsAsync(List<int> ids)
+        {
+            return await _context.Gifts
+                .Where(g => ids.Contains(g.Id))
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
     }
 }

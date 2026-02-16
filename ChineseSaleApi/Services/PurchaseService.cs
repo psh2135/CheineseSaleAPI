@@ -14,7 +14,9 @@ namespace ChineseSaleApi.Services
         void RemoveFromCart(int buyerId, AddToCartDto dto);
         IEnumerable<Package> GetAllPackages();
         IEnumerable<PurchaseDto> GetUserTickets(int buyerId);
-        AdminDashboardDto GetAdminDashboardStats();
+        Task< AdminDashboardDto> GetAdminDashboardStats();
+        Task<IEnumerable<GiftDto>> GetCartAsync(int buyerId);
+
     }
 
     public class PurchaseService : IPurchaseService
@@ -105,14 +107,25 @@ namespace ChineseSaleApi.Services
         }
         
 
-        public AdminDashboardDto GetAdminDashboardStats()
+        public async Task<AdminDashboardDto> GetAdminDashboardStats()
         {
             return new AdminDashboardDto
             {
-                TotalRevenue = _repo.GetTotalRevenue(),
-                TotalTicketsSold = _repo.GetTotalTicketsCount(),
-                TotalParticipants = _repo.GetUniqueParticipantsCount()
+                TotalRevenue = await _repo.GetTotalRevenue(),
+                TotalTicketsSold = await _repo.GetTotalTicketsCount(),
+                TotalParticipants = await _repo.GetUniqueParticipantsCount()
             };
+        }
+        public async Task<IEnumerable<GiftDto>> GetCartAsync(int buyerId)
+        {
+            var draft = await _repo.GetDraftByBuyerIdAsync(buyerId);
+
+            if (draft == null || !draft.GiftsAtCart.Any())
+                return Enumerable.Empty<GiftDto>();
+
+            var gifts = await _repo.GetGiftsByIdsAsync(draft.GiftsAtCart);
+
+            return _mapper.Map<IEnumerable<GiftDto>>(gifts);
         }
     }
 }

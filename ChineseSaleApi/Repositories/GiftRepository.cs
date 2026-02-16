@@ -14,7 +14,9 @@ public interface IGiftRepository
     IEnumerable<object> GetMostPopularGifts();
     IEnumerable<Gift> GetMostExpensiveGift();
     User? GetWinner(int id);
-   
+    List<Category> GetCategoriesByIds(List<int> categoryIds);
+
+
 }
 public class GiftRepository : IGiftRepository
 {
@@ -67,6 +69,7 @@ public class GiftRepository : IGiftRepository
         return _context.Gifts
             .Select(g => new
             {
+                GiftId = g.Id,
                 GiftName = g.Title,
                 TicketCount = g.Tickets.Count
             })
@@ -76,6 +79,9 @@ public class GiftRepository : IGiftRepository
     public IEnumerable<Gift> GetMostExpensiveGift()
     {
         var maxPrice = _context.Gifts.Max(g => g.Price);
+       
+        if (maxPrice == null)
+            return Enumerable.Empty<Gift>();
 
         return _context.Gifts
             .Where(g => g.Price == maxPrice)
@@ -90,5 +96,10 @@ public class GiftRepository : IGiftRepository
             .FirstOrDefault();
     }
 
-
+    public List<Category> GetCategoriesByIds(List<int> categoryIds)
+    {
+        return _context.Categories
+            .Where(c => categoryIds.Contains(c.Id))
+            .ToList();
+    }
 }

@@ -140,7 +140,7 @@ namespace ChineseSaleApi.Controllers
         [HttpGet("most-popular")]
         public IActionResult GetMostPopularGifts()
         {
-            var stats = _giftService.GetGiftsStatistics();
+            var stats = _giftService.GetMostPopularGifts();
             return Ok(stats);
         }
     }

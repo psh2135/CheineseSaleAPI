@@ -17,19 +17,20 @@ namespace ChineseSaleApi.Controllers
         [HttpPost("add")]
         public async Task<IActionResult> AddToCart([FromBody] AddToCartDto dto)
         {
-            var buyerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (buyerId == null)
+            if (!TryGetUserId(out int buyerId))
                 return Unauthorized();
 
-            await _service.AddToCartAsync(int.Parse(buyerId), dto);
+            await _service.AddToCartAsync(buyerId, dto);
 
             return Ok(new { message = "נוסף לסל בהצלחה" });
         }
 
-        [HttpPost("checkout/{buyerId}")]
-        public IActionResult Checkout(int buyerId)
+        [HttpPost("checkout")]
+        public IActionResult Checkout()
         {
+            if (!TryGetUserId(out int buyerId))
+                return Unauthorized();
+
             var purchase = _service.CompletePurchase(buyerId);
             return Ok(purchase);
         }
@@ -45,41 +46,48 @@ namespace ChineseSaleApi.Controllers
         [HttpDelete("remove")]
         public IActionResult RemoveFromCart([FromBody] AddToCartDto dto)
         {
-            var buyerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (buyerId == null)
+            if (!TryGetUserId(out int buyerId))
                 return Unauthorized();
 
-            _service.RemoveFromCart(int.Parse(buyerId), dto );
+           _service.RemoveFromCart(buyerId, dto);
+
             return Ok(new { message = "הכרטיס הוסר מהסל בהצלחה" });
         }
 
         [HttpGet]
-        [AllowAnonymous]
-        public ActionResult<IEnumerable<GiftDto>> GetAllPackages()
+        public async Task<IActionResult> GetCart()
         {
-            var gifts = _service.GetAllPackages();
-            return Ok(gifts);
+            if (!TryGetUserId(out int buyerId))
+                return Unauthorized();
+
+            var cart = await _service.GetCartAsync(buyerId);
+            return Ok(cart);
         }
 
         [HttpGet("my-tickets")]
         [Authorize]
         public IActionResult GetMyTickets()
         {
-            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (!TryGetUserId(out int buyerId))
+                return Unauthorized();
 
-            if (userIdClaim == null) return Unauthorized();
-
-            int buyerId = int.Parse(userIdClaim.Value);
-
-            var tickets = _service.GetUserTickets(buyerId);
+            var tickets =  _service.GetUserTickets(buyerId);
             return Ok(tickets);
         }
+
         [HttpGet("dashboard-stats")]
         [Authorize(Roles = "Admin")]
-        public IActionResult GetDashboardStats()
+        public async Task<IActionResult> GetDashboardStats()
         {
-            return Ok(_service.GetAdminDashboardStats());
+            var data = await _service.GetAdminDashboardStats();
+            return Ok(data);
+        }
+        private bool TryGetUserId(out int userId)
+        {
+            userId = 0;
+
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+            return claim != null && int.TryParse(claim.Value, out userId);
         }
     }
 }

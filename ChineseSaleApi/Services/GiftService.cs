@@ -30,10 +30,15 @@ public class GiftService : IGiftService
 
     public GiftDto CreateGift(CreateGiftDto dto)
     {
+        //_logger.LogInformation("Creating gift for DonorId={DonorId}", dto.DonorId);
+
         var gift = _mapper.Map<Gift>(dto);
 
+        gift.Categories =  _repository.GetCategoriesByIds(dto.CategoryIds);
+
         _repository.Add(gift);
-        _context.SaveChanges();
+
+        //_logger.LogInformation("Gift created successfully with Id={GiftId}", gift.Id);
 
         return _mapper.Map<GiftDto>(gift);
     }
@@ -86,8 +91,8 @@ public class GiftService : IGiftService
 
     public UserDto? GetWinner(int id)
     {
-        var Winner = _repository.GetWinner(id);
-        return _mapper.Map<IEnumerable<UserDto>>(Winner);
+        var winner = _repository.GetWinner(id);
+        return _mapper.Map<UserDto>(winner);
     }
 
 }
