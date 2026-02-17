@@ -129,7 +129,6 @@ using System.Security.Claims;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -219,24 +218,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 builder.Services.AddAuthorization();
-// ----------------------------------------
-// Serilog configuration
-// ----------------------------------------
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information() // כל הלוגים מ-Information ומעלה
-    .WriteTo.Console() // גם לקונסולה
-    .WriteTo.File(
-        path: "logs/app.log", // הקובץ בתיקייה logs
-        rollingInterval: RollingInterval.Day, // קובץ חדש כל יום
-        retainedFileCountLimit: 14, // שמירת 14 קבצים אחרונים
-        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
-    )
-    .CreateLogger();
 
 // החלפת Logging של ASP.NET Core ל-Serilog
 //builder.Host.UseSerilog();
 
-
+builder.Host.UseSerilog((ctx, config) =>
+    config.WriteTo.File("logs/app-.txt", rollingInterval: RollingInterval.Day));
 var app = builder.Build();
 
 
