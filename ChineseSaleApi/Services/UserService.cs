@@ -48,16 +48,57 @@ namespace ChineseSaleApi.Services
             return CreateUserWithRole(dto, UserRole.Donor);
         }
 
+
         private UserDto CreateUserWithRole(CreateUserDto dto, UserRole role)
         {
-            var user = _mapper.Map<User>(dto);
+            // ✅ בדיקה אם המייל כבר קיים
+            var existingUser = _repo.GetAll().FirstOrDefault(u => u.Email == dto.Email);
+            if (existingUser != null)
+            {
+                throw new InvalidOperationException("המייל כבר רשום במערכת");
+            }
 
+            // ✅ בדיקה אם שם המשתמש כבר קיים
+            var existingUserName = _repo.GetAll().FirstOrDefault(u => u.UserName == dto.UserName);
+            if (existingUserName != null)
+            {
+                throw new InvalidOperationException("שם המשתמש כבר קיים במערכת");
+            }
+
+            // ✅ בדיקת תקינות מייל
+            if (!IsValidEmail(dto.Email))
+            {
+                throw new InvalidOperationException("כתובת האימייל לא תקינה");
+            }
+
+            // ✅ בדיקת אורך סיסמה
+            if (dto.Password.Length < 6)
+            {
+                throw new InvalidOperationException("הסיסמה חייבת להכיל לפחות 6 תווים");
+            }
+
+            var user = _mapper.Map<User>(dto);
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
             user.Role = role;
 
             _repo.Add(user);
             _repo.Save();
+
             return _mapper.Map<UserDto>(user);
+        }
+
+        // ✅ פונקציית עזר לולידציית מייל
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public UserDto Login(string email, string password)

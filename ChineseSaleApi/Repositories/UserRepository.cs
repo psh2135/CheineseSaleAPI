@@ -10,6 +10,7 @@ namespace ChineseSaleApi.Repositories
 {
     public interface IUserRepository
     {
+        IEnumerable<User?> GetAll();
         Task<User?> GetByIdAsync(int id);
 
         User GetByEmail(string email);
@@ -29,7 +30,10 @@ namespace ChineseSaleApi.Repositories
         {
             _context = context;
         }
-
+        public IEnumerable<User> GetAll()
+        {
+            return _context.Users.ToList();
+        }
         public async Task<User?> GetByIdAsync(int id)
         {
             return await _context.Users.FindAsync(id);

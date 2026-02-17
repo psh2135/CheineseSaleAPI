@@ -64,8 +64,37 @@ namespace ChineseSaleApi.Controllers
         [HttpPost("register")]
         public ActionResult<UserDto> Register(CreateUserDto dto)
         {
-            var user = _service.Register(dto);
-            return Ok(user);
+            try
+            {
+                // ולידציה בסיסית
+                if (string.IsNullOrWhiteSpace(dto.UserName))
+                {
+                    return BadRequest(new { message = "שם משתמש הוא שדה חובה" });
+                }
+
+                if (string.IsNullOrWhiteSpace(dto.Email))
+                {
+                    return BadRequest(new { message = "אימייל הוא שדה חובה" });
+                }
+
+                if (string.IsNullOrWhiteSpace(dto.Password))
+                {
+                    return BadRequest(new { message = "סיסמה היא שדה חובה" });
+                }
+
+                var user = _service.Register(dto);
+                return Ok(user);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // שגיאה עסקית (כמו מייל קיים)
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // שגיאה כללית
+                return StatusCode(500, new { message = "אירעה שגיאה בהרשמה" });
+            }
         }
 
         [AllowAnonymous]
