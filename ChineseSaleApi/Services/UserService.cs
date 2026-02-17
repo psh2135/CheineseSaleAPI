@@ -17,6 +17,10 @@ namespace ChineseSaleApi.Services
         UserDto AddDonor(CreateUserDto dto);
         UserDto Login(string email, string password);
         IEnumerable<UserDto> GetAllDonors();
+        Task<IEnumerable<UserDto>> GetAllDonorsAsync();
+
+        Task<UserDto?> UpdateDonorAsync(int id, UpdateUserDto dto);
+        Task<bool> DeleteDonorAsync(int id);
     }
 
     public class UserService : IUserService
@@ -97,5 +101,34 @@ namespace ChineseSaleApi.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        public async Task<IEnumerable<UserDto>> GetAllDonorsAsync()
+        {
+            var donors = await _repo.GetUsersByRoleAsync(UserRole.Donor);
+            return _mapper.Map<IEnumerable<UserDto>>(donors);
+        }
+
+        public async Task<UserDto?> UpdateDonorAsync(int id, UpdateUserDto dto)
+        {
+            var donor = await _repo.GetByIdAsync(id);
+            if (donor == null || donor.Role != UserRole.Donor)
+                return null;
+
+            donor.UserName = dto.FullName;
+            donor.Email = dto.Email;
+
+            await _repo.UpdateAsync(donor);
+            return _mapper.Map<UserDto>(donor);
+        }
+
+        public async Task<bool> DeleteDonorAsync(int id)
+        {
+            var donor = await _repo.GetByIdAsync(id);
+            if (donor == null || donor.Role != UserRole.Donor)
+                return false;
+
+            await _repo.DeleteAsync(donor);
+            return true;
+        }
     }
 }
+

@@ -92,7 +92,29 @@ namespace ChineseSaleApi.Controllers
             var donors = _service.GetAllDonors();
             return Ok(donors);
         }
-    }
 
-    public class LoginRequest { public string Email { get; set; } public string Password { get; set; } }
+        [Authorize(Roles = "Admin")]
+        [HttpPut("donor/{id}")]
+        public async Task<ActionResult<UserDto>> UpdateDonor(int id, UpdateUserDto dto)
+        {
+            var updated = await _service.UpdateDonorAsync(id, dto);
+            if (updated == null)
+                return NotFound(new { message = "תורם לא נמצא" });
+
+            return Ok(updated);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("donor/{id}")]
+        public async Task<IActionResult> DeleteDonor(int id)
+        {
+            var success = await _service.DeleteDonorAsync(id);
+            if (!success)
+                return NotFound(new { message = "תורם לא נמצא" });
+
+            return NoContent();
+        }
+
+        public class LoginRequest { public string Email { get; set; } public string Password { get; set; } }
+    }
 }

@@ -82,5 +82,15 @@ namespace ChineseSaleApi.DTO
 
         public List<int>? CategoryIds { get; set; }
     }
+    public class WinnerGiftDto
+    {
+        public int GiftId { get; set; }
+        public string GiftTitle { get; set; } = null!;
+        public decimal Price { get; set; }
+
+        public int WinnerId { get; set; }
+        public string WinnerName { get; set; } = null!;
+        public string Email { get; set; } = null;
+    }
 
 }

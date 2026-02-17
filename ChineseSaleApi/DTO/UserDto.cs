@@ -74,5 +74,10 @@ namespace ChineseSaleApi.DTO
         public string UserName { get; set; } = null!;
         public string Email { get; set; } = null!;
     }
+    public class UpdateUserDto
+    {
+        public string FullName { get; set; }
+        public string Email { get; set; }
+    }
 
 }

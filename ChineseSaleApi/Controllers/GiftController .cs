@@ -101,6 +101,24 @@ namespace ChineseSaleApi.Controllers
             var results = _giftService.GetGiftsByCategory(categoryId);
             return Ok(results);
         }
+        [HttpGet("winner/{id}")]
+        [AllowAnonymous]
+        public ActionResult<UserDto> GetWinner(int id)
+        {
+            var winner = _giftService.GetWinner(id);
+
+            if (winner == null)
+                return NotFound($"No winner found for gift with id {id}");
+
+            return Ok(winner);
+        }
+        [HttpGet("winners")]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<WinnerGiftDto>>> GetAllWinners()
+        {
+            var winners = await _giftService.GetAllWinnersAsync();
+            return Ok(winners);
+        }
 
         //רק מנהל
         [HttpPost]

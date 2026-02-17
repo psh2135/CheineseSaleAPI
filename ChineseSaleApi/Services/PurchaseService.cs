@@ -117,13 +117,16 @@ namespace ChineseSaleApi.Services
         public async Task<IEnumerable<GiftDto>> GetCartAsync(int buyerId)
         {
             var draft = await _repo.GetDraftByBuyerIdAsync(buyerId);
-
             if (draft == null || !draft.GiftsAtCart.Any())
                 return Enumerable.Empty<GiftDto>();
 
             var gifts = await _repo.GetGiftsByIdsAsync(draft.GiftsAtCart);
+            var giftsDict = gifts.ToDictionary(g => g.Id);
 
-            return _mapper.Map<IEnumerable<GiftDto>>(gifts);
+            // מחזירים רשימה עם כפילויות לפי מה שנשמר בסל
+            return draft.GiftsAtCart
+                .Where(id => giftsDict.ContainsKey(id))
+                .Select(id => _mapper.Map<GiftDto>(giftsDict[id]));
         }
     }
 }

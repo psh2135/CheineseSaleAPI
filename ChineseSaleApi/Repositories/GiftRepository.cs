@@ -1,4 +1,5 @@
 ﻿using ChineseSaleApi.Data;
+using ChineseSaleApi.DTO;
 using ChineseSaleApi.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ public interface IGiftRepository
     IEnumerable<Gift> GetMostExpensiveGift();
     User? GetWinner(int id);
     List<Category> GetCategoriesByIds(List<int> categoryIds);
+    Task<IEnumerable<WinnerGiftDto>> GetAllWinnersAsync();
 
 
 }
@@ -99,6 +101,22 @@ public class GiftRepository : IGiftRepository
             .Where(g => g.Id == id)
             .Select(g => g.Winner)
             .FirstOrDefault();
+    }
+    public async Task<IEnumerable<WinnerGiftDto>> GetAllWinnersAsync()
+    {
+        return await _context.Gifts
+            .Where(g => g.IsDrawn && g.WinnerUserId != null)
+            .Select(g => new WinnerGiftDto
+            {
+                GiftId = g.Id,
+                GiftTitle = g.Title,
+                Price = g.Price,
+                WinnerId = g.Winner!.Id,
+                WinnerName = g.Winner.UserName,
+                Email = g.Winner.Email
+            })
+            .AsNoTracking()
+            .ToListAsync();
     }
 
     public List<Category> GetCategoriesByIds(List<int> categoryIds)

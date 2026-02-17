@@ -7,7 +7,7 @@ namespace ChineseSaleApi.Controllers
 {
     [ApiController]
     [Route("api/tickets")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class TicketController : ControllerBase
     {
         private readonly ITicketService _service;
@@ -19,7 +19,6 @@ namespace ChineseSaleApi.Controllers
 
         
         [HttpGet("gift/{giftId}")]
-        [Authorize(Roles = "Admin")]
         public IActionResult GetByGift(int giftId)
         {
             return Ok(_service.GetByGift(giftId));
@@ -27,7 +26,7 @@ namespace ChineseSaleApi.Controllers
 
 
         [HttpGet("admin")]
-        public IActionResult GetAll()
+        public IActionResult GetAllTickets()
         {
             return Ok(_service.GetAll());
         }

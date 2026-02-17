@@ -14,6 +14,8 @@ public interface IGiftService
     IEnumerable<object> GetMostPopularGifts();
     IEnumerable<GiftDto> GetMostExpensiveGift();
     UserDto? GetWinner(int id);
+    Task<IEnumerable<WinnerGiftDto>> GetAllWinnersAsync();
+
 }
 public class GiftService : IGiftService
 {
@@ -121,6 +123,10 @@ public class GiftService : IGiftService
     {
         var winner = _repository.GetWinner(id);
         return _mapper.Map<UserDto>(winner);
+    }
+    public async Task<IEnumerable<WinnerGiftDto>> GetAllWinnersAsync()
+    {
+        return await _repository.GetAllWinnersAsync();
     }
 
 }
